@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Admin Dashboard</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Bootstrap Icons -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+        rel="stylesheet"
+    >
+
+
+    <style>
+
+        /* =========================
+           RESET
+        ========================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+
+            font-family: "Segoe UI", sans-serif;
+
+            background: #f5f7fb;
+
+            color: #334155;
+
+            font-size: 14px;
+
+            overflow-x: hidden;
+        }
+
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            width: 190px;
+
+            height: 100vh;
+
+            background: #1e293b;
+
+            color: white;
+
+            z-index: 1000;
+
+            transition: all 0.3s ease;
+
+            overflow-y: auto;
+
+            overflow-x: hidden;
+        }
+
+
+        /* Sidebar collapsed */
+
+        .sidebar.hide {
+
+            width: 70px;
+        }
+
+
+        /* =========================
+           SIDEBAR HEADER
+        ========================= */
+
+        .sidebar-header {
+
+            height: 55px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background:
+                linear-gradient(
+                    45deg,
+                    #0f172a,
+                    #1e3a8a
+                );
+
+            font-size: 17px;
+
+            font-weight: 700;
+
+            white-space: nowrap;
+        }
+
+
+        /* =========================
+           SIDEBAR LINKS
+        ========================= */
+
+        .sidebar a {
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 10px;
+
+            width: 100%;
+
+            padding: 11px 15px;
+
+            color: #cbd5e1;
+
+            text-decoration: none;
+
+            font-size: 15px;
+
+            transition: 0.25s;
+
+            white-space: nowrap;
+        }
+
+
+        .sidebar a i {
+
+            min-width: 20px;
+
+            font-size: 17px;
+
+            text-align: center;
+        }
+
+
+        .sidebar a:hover {
+
+            background: #334155;
+
+            color: white;
+        }
+
+
+        .sidebar a.active {
+
+            background: #334155;
+
+            color: white !important;
+
+            border-left: 3px solid #3b82f6;
+        }
+
+
+        /* Hide text when collapsed */
+
+        .sidebar.hide a span {
+
+            display: none;
+        }
+
+
+        .sidebar.hide .sidebar-header span {
+
+            display: none;
+        }
+
+
+        /* Center icons */
+
+        .sidebar.hide a {
+
+            justify-content: center;
+
+            padding-left: 0;
+
+            padding-right: 0;
+        }
+
+
+        /* =========================
+           TOPBAR
+        ========================= */
+
+        .topbar {
+
+            position: fixed;
+
+            top: 0;
+
+            right: 0;
+
+            left: 190px;
+
+            height: 55px;
+
+            background: white;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            padding: 0 18px;
+
+            border-bottom: 1px solid #e2e8f0;
+
+            z-index: 999;
+
+            transition: all 0.3s ease;
+        }
+
+
+        .topbar.full {
+
+            left: 70px;
+        }
+
+
+        .topbar h6 {
+
+            color: #0f172a;
+
+            font-weight: 600;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           TOGGLE BUTTON
+        ========================= */
+
+        .toggle-btn {
+
+            width: 34px;
+
+            height: 34px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            cursor: pointer;
+
+            border-radius: 7px;
+
+            color: #475569;
+
+            font-size: 20px;
+
+            transition: 0.2s;
+        }
+
+
+        .toggle-btn:hover {
+
+            background: #f1f5f9;
+
+            color: #2563eb;
+        }
+
+
+        /* =========================
+           MAIN CONTENT
+        ========================= */
+
+        .content {
+
+            margin-left: 190px;
+
+            padding: 75px 18px 25px;
+
+            min-height: 100vh;
+
+            transition: all 0.3s ease;
+        }
+
+
+        .content.full {
+
+            margin-left: 70px;
+        }
+
+
+        /* =========================
+           DASHBOARD CARDS
+        ========================= */
+
+        .card-custom {
+
+            border: none;
+
+            border-radius: 10px;
+
+            padding: 15px;
+
+            background: white;
+
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.05);
+
+            transition: 0.25s;
+        }
+
+
+        .card-custom:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 6px 15px rgba(0, 0, 0, 0.08);
+        }
+
+
+        .card-title {
+
+            font-size: 12px;
+
+            color: #64748b;
+
+            margin-bottom: 5px;
+        }
+
+
+        .card-value {
+
+            font-size: 22px;
+
+            font-weight: 700;
+
+            color: #0f172a;
+        }
+
+
+        /* =========================
+           FIVE CARDS
+        ========================= */
+
+        .five-cols {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(5, 1fr);
+
+            gap: 15px;
+
+            width: 100%;
+        }
+
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        .table-container {
+
+            background: white;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            margin-top: 15px;
+
+            overflow-x: auto;
+
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+
+        /* =========================
+           OVERLAY
+        ========================= */
+
+        #overlay {
+
+            display: none;
+
+            position: fixed;
+
+            inset: 0;
+
+            background:
+                rgba(0, 0, 0, 0.45);
+
+            z-index: 998;
+        }
+
+
+        #overlay.show {
+
+            display: block;
+        }
+
+
+        /* =========================
+           TABLET
+        ========================= */
+
+        @media (max-width: 1100px) {
+
+            .five-cols {
+
+                grid-template-columns:
+                    repeat(3, 1fr);
+            }
+        }
+
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 768px) {
+
+            /* Sidebar */
+
+            .sidebar {
+
+                left: -190px;
+
+                width: 190px;
+            }
+
+
+            .sidebar.show {
+
+                left: 0;
+            }
+
+
+            /* Topbar */
+
+            .topbar {
+
+                left: 0;
+
+                height: 55px;
+
+                padding: 0 12px;
+            }
+
+
+            .topbar.full {
+
+                left: 0;
+            }
+
+
+            /* Content */
+
+            .content {
+
+                margin-left: 0;
+
+                padding:
+                    70px 12px 20px;
+            }
+
+
+            .content.full {
+
+                margin-left: 0;
+            }
+
+
+            /* Cards */
+
+            .five-cols {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+
+                gap: 10px;
+            }
+
+
+            .card-custom {
+
+                padding: 12px;
+            }
+
+
+            .card-value {
+
+                font-size: 20px;
+            }
+        }
+
+
+        /* =========================
+           SMALL MOBILE
+        ========================= */
+
+        @media (max-width: 576px) {
+
+            .five-cols {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .topbar h6 {
+
+                font-size: 13px;
+            }
+
+
+            .content {
+
+                padding-left: 10px;
+
+                padding-right: 10px;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         SIDEBAR
+    ========================= -->
+
+    <aside
+        class="sidebar"
+        id="sidebar"
+    >
+
+        <!-- Header -->
+
+        <div class="sidebar-header">
+
+            <span>Admin</span>
+
+        </div>
+
+
+        <!-- Dashboard -->
+
+        <a
+            href="/dashboard"
+            class="active"
+        >
+
+            <i class="bi bi-speedometer2"></i>
+
+            <span>Dashboard</span>
+
+        </a>
+
+
+       @if(
+    Auth::guard('web')->check() &&
+    Auth::guard('web')->user()->role === 'admin'
+)
+
+    {{-- =====================================================
+         ADMIN
+    ====================================================== --}}
+
+    <a href="{{ route('staff.index') }}">
+
+        <i class="bi bi-person-badge-fill"></i>
+
+        <span>Manage Supervisors</span>
+
+    </a>
+
+
+    <a href="{{ route('student.index') }}">
+
+        <i class="bi bi-mortarboard-fill"></i>
+
+        <span>Manage Students</span>
+
+    </a>
+
+
+    <a href="{{ route('supervisor.assignments.index') }}">
+
+        <i class="bi bi-person-check-fill"></i>
+
+        <span>Assign Students</span>
+
+    </a>
+
+
+   
+
+
+    <a href="{{ route('supervisor.assignments.index') }}">
+
+        <i class="bi bi-bell-fill"></i>
+
+        <span>Notifications</span>
+
+    </a>
+
+
+@elseif(
+    Auth::guard('web')->check() &&
+    Auth::guard('web')->user()->role === 'supervisors'
+)
+
+    {{-- =====================================================
+         SUPERVISOR
+    ====================================================== --}}
+
+    <a href="{{ route('supervisor.students') }}">
+
+        <i class="bi bi-people-fill"></i>
+
+        <span>My Students</span>
+
+    </a>
+
+
+    <a href="{{ route('supervisor.research') }}">
+
+        <i class="bi bi-journal-text"></i>
+
+        <span>Research</span>
+
+    </a>
+
+
+@elseif(
+    Auth::guard('student')->check()
+)
+
+    {{-- =====================================================
+         STUDENT
+    ====================================================== --}}
+
+    <a href="{{ route('student.research') }}">
+
+        <i class="bi bi-file-earmark-text-fill"></i>
+
+        <span>Proposal</span>
+
+    </a>
+
+
+    <a href="{{ route('student.research.responses') }}">
+
+        <i class="bi bi-chat-left-text-fill"></i>
+
+        <span>Responses</span>
+
+    </a>
+
+
+@endif
+
+        <!-- Logout -->
+        <a href="{{ route('settings') }}">
+
+            <i class="bi bi-people-fill"></i>
+
+            <span>Setting</span>
+
+        </a>
+
+        <a
+    href="#"
+    onclick="
+        event.preventDefault();
+        document.getElementById('logout-form').submit();
+    "
+>
+    <i class="bi bi-box-arrow-right"></i>
+    <span>Logout</span>
+</a>
+
+<form
+    id="logout-form"
+    action="{{ route('logout') }}"
+    method="POST"
+    style="display:none;"
+>
+    @csrf
+</form>
+
+    </aside>
+
+
+
+    <!-- =========================
+         OVERLAY
+    ========================= -->
+
+    <div id="overlay"></div>
+
+
+
+    <!-- =========================
+         TOPBAR
+    ========================= -->
+
+    <header
+        class="topbar"
+        id="topbar"
+    >
+
+        <div
+            class="d-flex align-items-center gap-2"
+        >
+
+            <div
+                class="toggle-btn"
+                id="toggleBtn"
+                onclick="toggleSidebar()"
+            >
+
+                <i class="bi bi-list"></i>
+
+            </div>
+
+
+            <h6 class="mb-0">
+
+                Dashboard
+
+            </h6>
+
+        </div>
+
+
+        <!-- Right Side -->
+
+        <div class="d-flex align-items-center gap-3">
+
+            <!-- Notification -->
+
+            <button
+                class="btn btn-light position-relative"
+                type="button"
+            >
+
+                <i class="bi bi-bell"></i>
+
+                <span
+                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                >
+                    0
+                </span>
+
+            </button>
+
+
+            <!-- User -->
+
+            <div
+                class="d-flex align-items-center gap-2"
+            >
+
+                <i
+                    class="bi bi-person-circle fs-5"
+                ></i>
+
+                <span
+                    class="d-none d-sm-inline"
+                >
+                    Admin
+                </span>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =========================
+         CONTENT
+    ========================= -->
+
+    <main
+        class="content"
+        id="content"
+    >
+
+        @yield("content")
+
+    </main>
+
+
+
+    <!-- Bootstrap JS -->
+
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+    ></script>
+
+
+    <!-- =========================
+         SIDEBAR JAVASCRIPT
+    ========================= -->
+
+    <script>
+
+        function toggleSidebar() {
+
+            const sidebar =
+                document.getElementById("sidebar");
+
+            const content =
+                document.getElementById("content");
+
+            const topbar =
+                document.getElementById("topbar");
+
+            const overlay =
+                document.getElementById("overlay");
+
+
+            /* ======================
+               MOBILE
+            ====================== */
+
+            if (window.innerWidth <= 768) {
+
+                sidebar.classList.toggle("show");
+
+                overlay.classList.toggle(
+                    "show",
+                    sidebar.classList.contains("show")
+                );
+
+                return;
+            }
+
+
+            /* ======================
+               DESKTOP
+            ====================== */
+
+            sidebar.classList.toggle("hide");
+
+            content.classList.toggle("full");
+
+            topbar.classList.toggle("full");
+        }
+
+
+
+        /* =========================
+           CLOSE MOBILE SIDEBAR
+        ========================= */
+
+        document
+            .getElementById("overlay")
+            .addEventListener(
+                "click",
+                function () {
+
+                    document
+                        .getElementById("sidebar")
+                        .classList.remove("show");
+
+                    this.classList.remove("show");
+
+                }
+            );
+
+
+
+        /* =========================
+           AUTO RESET ON RESIZE
+        ========================= */
+
+        window.addEventListener(
+            "resize",
+            function () {
+
+                const sidebar =
+                    document.getElementById("sidebar");
+
+                const content =
+                    document.getElementById("content");
+
+                const topbar =
+                    document.getElementById("topbar");
+
+                const overlay =
+                    document.getElementById("overlay");
+
+
+                if (window.innerWidth > 768) {
+
+                    sidebar.classList.remove("show");
+
+                    overlay.classList.remove("show");
+
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>
