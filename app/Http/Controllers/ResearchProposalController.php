@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\ResearchCorrection;
 use App\Models\ResearchProposal;
 use App\Models\SupervisorAssignment;
@@ -170,6 +171,28 @@ $research = ResearchProposal::create([
     'status' => 'pending',
 
 ]);
+if ($research) {
+
+    $supervisors = $student->supervisorAssignments;
+
+    foreach ($supervisors as $supervisor) {
+
+        Notification::create([
+            'title' => 'Submission Alert',
+
+            'message' =>
+                'Student ' .
+                $student->firstname . ' ' .
+                $student->middlename . ' ' .
+                $student->lastname .
+                ' has submitted a research.',
+
+            'supervisor_id' => $supervisor->teacher_id,
+
+            'is_read' => false,
+        ]);
+    }
+}
 
 
 /*

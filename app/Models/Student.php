@@ -12,7 +12,6 @@ class Student extends Authenticatable
 
     protected $table = 'students';
 
-
     protected $fillable = [
         'firstname',
         'middlename',
@@ -26,12 +25,10 @@ class Student extends Authenticatable
         'passsword',
     ];
 
-
     protected $hidden = [
         'password',
         'remember_token',
     ];
-
 
     /*
     |--------------------------------------------------------------------------
@@ -47,12 +44,17 @@ class Student extends Authenticatable
         );
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Supervisor Assignments
+    |--------------------------------------------------------------------------
+    */
 
     public function supervisorAssignments()
-{
-    return $this->hasMany(
-        SupervisorAssignment::class,
-        'student_id'
-    );
-}
+    {
+        return $this->hasMany(
+            SupervisorAssignment::class,
+            'student_id'
+        );
+    }
 }

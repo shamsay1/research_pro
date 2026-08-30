@@ -114,7 +114,7 @@
     }
 
     .student-reg {
-        font-size: 12px;
+        font-size: 16px;
         color: #64748b;
         margin-top: 3px;
     }
@@ -132,7 +132,7 @@
         display: inline-block;
         padding: 5px 10px;
         border-radius: 20px;
-        font-size: 11px;
+        font-size: 12px;
         font-weight: 700;
     }
 
@@ -178,7 +178,7 @@
     }
 
     .detail-title {
-        font-size: 13px;
+        font-size: 16px;
         font-weight: 700;
         color: #334155;
         margin-bottom: 12px;
@@ -199,7 +199,7 @@
     }
 
     .detail-label {
-        font-size: 11px;
+        font-size: 16px;
         color: #64748b;
         margin-bottom: 4px;
     }
@@ -217,7 +217,7 @@
     ========================================================= */
 
     .supervisors-title {
-        font-size: 14px;
+        font-size: 16px;
         font-weight: 700;
         color: #0f172a;
         margin-bottom: 12px;
@@ -275,7 +275,7 @@
     }
 
     .supervisor-role {
-        font-size: 11px;
+        font-size: 15px;
         color: #64748b;
         margin-top: 2px;
     }
@@ -289,7 +289,7 @@
         display: flex;
         align-items: center;
         gap: 8px;
-        font-size: 12px;
+        font-size: 16px;
         color: #475569;
         margin-bottom: 8px;
     }
@@ -887,9 +887,9 @@
 
                                                 <div class="supervisor-name">
 
-                                                    {{ $coreSupervisor->teacher->firstname }}
-                                                    {{ $coreSupervisor->teacher->middlename }}
-                                                    {{ $coreSupervisor->teacher->lastname }}
+                                                    {{ $coreSupervisor->supervisor->firstname }}
+                                                    {{ $coreSupervisor->supervisor->middlename }}
+                                                    {{ $coreSupervisor->supervisor->lastname }}
 
                                                 </div>
 
@@ -941,7 +941,7 @@
 
                                             <span>
 
-                                                {{ $coreSupervisor->teacher->email }}
+                                                {{ $coreSupervisor->supervisor->email }}
 
                                             </span>
 
@@ -954,7 +954,7 @@
 
                                             <span>
 
-                                                {{ $coreSupervisor->teacher->phone }}
+                                                {{ $coreSupervisor->supervisor->phone }}
 
                                             </span>
 
@@ -967,7 +967,7 @@
 
                                             <span>
 
-                                                {{ ucfirst($coreSupervisor->teacher->role) }}
+                                                {{ ucfirst($coreSupervisor->supervisor->role) }}
 
                                             </span>
 
@@ -1023,9 +1023,9 @@
 
                                                 <div class="supervisor-name">
 
-                                                    {{ $principalSupervisor->teacher->firstname }}
-                                                    {{ $principalSupervisor->teacher->middlename }}
-                                                    {{ $principalSupervisor->teacher->lastname }}
+                                                    {{ $principalSupervisor->supervisor->firstname }}
+                                                    {{ $principalSupervisor->supervisor->middlename }}
+                                                    {{ $principalSupervisor->supervisor->lastname }}
 
                                                 </div>
 
@@ -1077,7 +1077,7 @@
 
                                             <span>
 
-                                                {{ $principalSupervisor->teacher->email }}
+                                                {{ $principalSupervisor->supervisor->email }}
 
                                             </span>
 
@@ -1090,7 +1090,7 @@
 
                                             <span>
 
-                                                {{ $principalSupervisor->teacher->phone }}
+                                                {{ $principalSupervisor->supervisor->phone }}
 
                                             </span>
 
@@ -1103,7 +1103,7 @@
 
                                             <span>
 
-                                                {{ ucfirst($principalSupervisor->teacher->role) }}
+                                                {{ ucfirst($principalSupervisor->supervisor->role) }}
 
                                             </span>
 

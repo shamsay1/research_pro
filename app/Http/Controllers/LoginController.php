@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ChatMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -523,7 +524,6 @@ class LoginController extends Controller
             'user',
             'role',
             'guard',
-
             'researchProjects',
             'registeredStudents',
             'supervisors',

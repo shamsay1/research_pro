@@ -21,9 +21,9 @@ class SupervisorAssignment extends Model
             'student_id'
         );
     }
+    
 
-
-    public function teacher()
+    public function supervisor()
     {
         return $this->belongsTo(
             SystemUser::class,

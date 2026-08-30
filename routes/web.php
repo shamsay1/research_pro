@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\ResearchProposalController;
+use App\Http\Controllers\ResearchReportController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
@@ -115,14 +117,6 @@ Route::get(
         [ResearchProposalController::class, 'responses']
     )->name('student.research.responses');
 
-// ===============================
-// STUDENT
-// ===============================
-
-Route::resource(
-    '/student',
-    StudentController::class
-);
 
 
 // ===============================
@@ -167,7 +161,18 @@ Route::put(
     '/settings/password',
     [SettingsController::class, 'updatePassword']
 )->name('settings.password');
+Route::get( '/student/chat', [ChatController::class, 'studentChat'] )->name('student.chat'); 
+
+Route::resource('/student',StudentController::class);
+Route::get( '/admin/research-report', [ResearchReportController::class, 'index'] )->name('admin.research.report');
 Route::get(
     '/admin/research/{studentId}',
     [UserController::class, 'researchDetails']
 )->name('admin.research.details');
+Route::middleware('auth:student')->group(function () { 
+Route::post( '/student/chat/send', [ChatController::class, 'sendMessage'] )->name('student.chat.send'); });
+Route::get( '/admin/chats', [ChatController::class, 'adminChats'] )->name('admin.chats'); // Fungua chat ya student mmoja 
+Route::get( '/admin/chat/{studentId}', [ChatController::class, 'adminChat'] )->name('admin.chat'); 
+// Admin send message 
+Route::post( '/admin/chat/{studentId}/send', [ChatController::class, 'adminSendMessage'] )->name('admin.chat.send');
+ // =============================== // STUDENT // =============================== Route::resource( '/student', StudentController::class );

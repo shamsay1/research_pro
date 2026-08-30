@@ -245,6 +245,70 @@
 
             font-size: 14px;
         }
+        .chat-menu {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+.chat-icon {
+    position: relative;
+    width: 25px;
+    height: 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: visible !important;
+}
+
+.chat-icon i {
+    font-size: 20px;
+    line-height: 1;
+}
+
+
+/* ===============================
+   NOTIFICATION BADGE
+================================ */
+
+.chat-notification {
+    position: absolute;
+
+    /* CORNER YA ICON */
+    top: -9px;
+    right: -11px;
+
+    min-width: 17px;
+    height: 17px;
+
+    padding: 0 4px;
+
+    background: #ff3b30;
+
+    color: #fff;
+
+    border-radius: 50px;
+
+    border: 2px solid #fff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 9px;
+    font-weight: 700;
+
+    line-height: 1;
+
+    z-index: 9999;
+
+    white-space: nowrap;
+
+    box-sizing: border-box;
+}
 
 
         /* =========================
@@ -547,6 +611,41 @@
 <body>
 
 
+
+ @php
+
+    // Chat unread count
+    $unreadChats = App\Models\ChatMessage::where('is_read', 0)->count();
+
+    // Default values
+    $notifications = collect();
+    $unreadNotifications = 0;
+
+    // Check logged in user
+    if (Auth::guard('web')->check()) {
+
+        $user = Auth::guard('web')->user();
+
+        // User's notifications
+        $notifications = App\Models\Notification::where(
+            'supervisor_id',
+            $user->id
+        )
+        ->latest()
+        ->get();
+
+        // Unread notifications
+        $unreadNotifications = App\Models\Notification::where(
+            'supervisor_id',
+            $user->id
+        )
+        ->where('is_read', false)
+        ->count();
+    }
+
+@endphp
+
+
     <!-- =========================
          SIDEBAR
     ========================= -->
@@ -613,16 +712,35 @@
         <span>Assign Students</span>
 
     </a>
+ <a href="{{ route('admin.chats') }}" class="chat-menu">
+
+    <div class="chat-icon">
+
+        <i class="bi bi-chat-right-text-fill"></i>
+
+        @if($unreadChats > 0)
+
+            <span class="chat-notification">
+                {{ $unreadChats > 99 ? '99+' : $unreadChats }}
+            </span>
+
+        @endif
+
+    </div>
+
+    <span>Chats</span>
+
+</a>
 
 
    
 
 
-    <a href="{{ route('supervisor.assignments.index') }}">
+    <a href="{{ route('admin.research.report') }}">
 
-        <i class="bi bi-bell-fill"></i>
+       <i class="bi bi-bar-chart"></i>
 
-        <span>Notifications</span>
+        <span>Report</span>
 
     </a>
 
@@ -678,6 +796,14 @@
         <span>Responses</span>
 
     </a>
+    <a href="{{ route('student.chat') }}">
+
+        <i class="bi bi-chat-left-text-fill"></i>
+
+        <span>Chats</span>
+
+    </a>
+    
 
 
 @endif
@@ -757,46 +883,166 @@
 
 
         <!-- Right Side -->
-
         <div class="d-flex align-items-center gap-3">
 
-            <!-- Notification -->
+    <!-- Notification -->
+    <div class="dropdown">
 
-            <button
-                class="btn btn-light position-relative"
-                type="button"
-            >
+        <button
+            class="btn btn-light position-relative"
+            type="button"
+            id="notificationDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+        >
 
-                <i class="bi bi-bell"></i>
+            <i class="bi bi-bell fs-5"></i>
 
+            @if($unreadNotifications > 0)
                 <span
                     class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
                 >
-                    0
+                    {{ $unreadNotifications }}
                 </span>
+            @endif
 
-            </button>
+        </button>
 
 
-            <!-- User -->
+        <!-- Notification Card -->
+        <div
+            class="dropdown-menu dropdown-menu-end shadow border-0 p-0"
+            style="width: 380px;"
+            aria-labelledby="notificationDropdown"
+        >
 
-            <div
-                class="d-flex align-items-center gap-2"
-            >
+            <!-- Header -->
+            <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
 
-                <i
-                    class="bi bi-person-circle fs-5"
-                ></i>
+                <div>
+                    <h6 class="mb-0 fw-bold">
+                        Notifications
+                    </h6>
 
-                <span
-                    class="d-none d-sm-inline"
+                    <small class="text-muted">
+                        Your latest notifications
+                    </small>
+                </div>
+
+                @if($unreadNotifications > 0)
+                    <span class="badge bg-danger">
+                        {{ $unreadNotifications }} New
+                    </span>
+                @endif
+
+            </div>
+
+
+            <!-- Notifications -->
+            <div style="max-height: 400px; overflow-y: auto;">
+
+                @forelse($notifications as $notification)
+
+                    <div
+                        class="p-3 border-bottom notification-item
+                        {{ !$notification->is_read ? 'bg-light' : '' }}"
+                    >
+
+                        <div class="d-flex gap-3">
+
+                            <!-- Icon -->
+                            <div>
+                                <div
+                                    class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center"
+                                    style="width: 40px; height: 40px;"
+                                >
+                                    <i class="bi bi-bell"></i>
+                                </div>
+                            </div>
+
+
+                            <!-- Content -->
+                            <div class="flex-grow-1">
+
+                                <div class="d-flex justify-content-between">
+
+                                    <h6 class="mb-1 fw-bold">
+                                        {{ $notification->title }}
+                                    </h6>
+
+                                    @if(!$notification->is_read)
+                                        <span class="badge bg-primary">
+                                            New
+                                        </span>
+                                    @endif
+
+                                </div>
+
+                                <p class="mb-1 text-muted small">
+                                    {{ $notification->message }}
+                                </p>
+
+                                <small class="text-secondary">
+                                    {{ $notification->created_at->diffForHumans() }}
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                @empty
+
+                    <div class="text-center p-4">
+
+                        <i
+                            class="bi bi-bell-slash fs-1 text-muted"
+                        ></i>
+
+                        <p class="text-muted mb-0 mt-2">
+                            No notifications
+                        </p>
+
+                    </div>
+
+                @endforelse
+
+            </div>
+
+
+            <!-- Footer -->
+            <div class="p-2 text-center border-top">
+
+                <a
+                    href=""
+                    class="text-decoration-none small"
                 >
-                    Admin
-                </span>
+                    View all notifications
+                </a>
 
             </div>
 
         </div>
+
+    </div>
+
+
+    <!-- User -->
+
+    <div class="d-flex align-items-center gap-2">
+
+        <i class="bi bi-person-circle fs-5"></i>
+
+        <span class="d-none d-sm-inline">
+            {{ Auth::guard('web')->user()->firstname ?? 'Admin' }}
+        </span>
+
+    </div>
+
+</div>
+
+       
 
     </header>
 

@@ -116,7 +116,7 @@ class UserController extends Controller
 {
     $assignments = SupervisorAssignment::with([
         'student',
-        'teacher'
+        'supervisor'
     ])
     ->latest()
     ->get()

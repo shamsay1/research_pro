@@ -20,7 +20,7 @@
 
     .page-header p {
         margin:5px 0 0;
-        font-size:13px;
+        font-size:16px;
         color:#64748b;
     }
 
@@ -37,7 +37,7 @@
         color:#334155;
         padding:9px 14px;
         border-radius:7px;
-        font-size:13px;
+        font-size:16px;
         font-weight:600;
         text-decoration:none;
     }
@@ -63,7 +63,7 @@
     }
 
     .info-title {
-        font-size:13px;
+        font-size:16px;
         font-weight:700;
         color:#0f172a;
         margin-bottom:14px;
@@ -82,12 +82,12 @@
     }
 
     .info-label {
-        font-size:12px;
+        font-size:16px;
         color:#64748b;
     }
 
     .info-value {
-        font-size:13px;
+        font-size:16px;
         font-weight:600;
         color:#334155;
         text-align:right;
@@ -112,7 +112,7 @@
     }
 
     .document-name {
-        font-size:13px;
+        font-size:16px;
         font-weight:600;
         color:#334155;
         word-break:break-all;
@@ -179,20 +179,20 @@
     }
 
     .timeline-title {
-        font-size:13px;
+        font-size:16px;
         font-weight:700;
         color:#0f172a;
         margin-bottom:3px;
     }
 
     .timeline-date {
-        font-size:11px;
+        font-size:16px;
         color:#64748b;
         margin-bottom:6px;
     }
 
     .timeline-text {
-        font-size:13px;
+        font-size:16px;
         color:#475569;
         line-height:1.6;
         background:#f8fafc;
