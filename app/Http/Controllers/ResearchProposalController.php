@@ -283,53 +283,53 @@ public function store(Request $request)
         |--------------------------------------------------------------------------
         */
 
-        if (!empty($principal->email)) {
+        // if (!empty($principal->email)) {
 
-            try {
+        //     try {
 
-                Mail::raw(
+        //         Mail::raw(
 
-                    "Dear {$supervisorName},\n\n" .
+        //             "Dear {$supervisorName},\n\n" .
 
-                    "A new research proposal has been submitted by your assigned student and requires your review.\n\n" .
+        //             "A new research proposal has been submitted by your assigned student and requires your review.\n\n" .
 
-                    "Student Name: " .
-                    $studentName .
-                    "\n\n" .
+        //             "Student Name: " .
+        //             $studentName .
+        //             "\n\n" .
 
-                    "Research Title: " .
-                    $research->title .
-                    "\n\n" .
+        //             "Research Title: " .
+        //             $research->title .
+        //             "\n\n" .
 
-                    "Submission Date: " .
-                    $research->created_at
-                        ->format('d M Y, h:i A') .
-                    "\n\n" .
+        //             "Submission Date: " .
+        //             $research->created_at
+        //                 ->format('d M Y, h:i A') .
+        //             "\n\n" .
 
-                    "Current Status: Pending Review\n\n" .
+        //             "Current Status: Pending Review\n\n" .
 
-                    "Please login to the Research Management System to review the student's research proposal.\n\n" .
-                    "click the link http://127.0.0.1:8000/".
-                    "\n".
-                    "Regards,\n" .
-                    "Research Management System",
+        //             "Please login to the Research Management System to review the student's research proposal.\n\n" .
+        //             "click the link http://127.0.0.1:8000/".
+        //             "\n".
+        //             "Regards,\n" .
+        //             "Research Management System",
 
-                    function ($message) use ($principal) {
+        //             function ($message) use ($principal) {
 
-                        $message
-                            ->to($principal->email)
-                            ->subject(
-                                'New Research Proposal Submitted'
-                            );
-                    }
+        //                 $message
+        //                     ->to($principal->email)
+        //                     ->subject(
+        //                         'New Research Proposal Submitted'
+        //                     );
+        //             }
 
-                );
+        //         );
 
-            } catch (\Throwable $e) {
+        //     } catch (\Throwable $e) {
 
-                echo 'error';
-            }
-        }
+        //         echo 'error';
+        //     }
+        // }
     }
 
 
@@ -737,57 +737,57 @@ $student = $research->student;
 |--------------------------------------------------------------------------
 */
 
-if (
-    $student &&
-    !empty($student->email)
-) {
+// if (
+//     $student &&
+//     !empty($student->email)
+// ) {
 
-    try {
+//     try {
 
-        $attachmentMessage = '';
+//         $attachmentMessage = '';
 
-        if ($attachmentPath) {
+//         if ($attachmentPath) {
 
-            $attachmentMessage =
-                "\n\nThe supervisor has also attached a document/image with the correction instructions.";
+//             $attachmentMessage =
+//                 "\n\nThe supervisor has also attached a document/image with the correction instructions.";
 
-        }
+//         }
 
 
-        Mail::raw(
+//         Mail::raw(
 
-            "Dear {$student->firstname} {$student->middlename} {$student->lastname},\n\n" .
+//             "Dear {$student->firstname} {$student->middlename} {$student->lastname},\n\n" .
 
-            "Your supervisor has reviewed your research submittion and requested some corrections.\n\n" .
+//             "Your supervisor has reviewed your research submittion and requested some corrections.\n\n" .
 
-            "Research Title: {$research->title}\n\n" .
+//             "Research Title: {$research->title}\n\n" .
 
-            $attachmentMessage .
+//             $attachmentMessage .
 
-            "\n\nPlease login to the Research Management System, review the supervisor's comments and attachment, make the required corrections, and resubmit your research proposal.\n\n" .
+//             "\n\nPlease login to the Research Management System, review the supervisor's comments and attachment, make the required corrections, and resubmit your research proposal.\n\n" .
 
-            "Current Status: Correction Required\n\n" .
-            "Click the link http://127.0.0.1:8000/",
+//             "Current Status: Correction Required\n\n" .
+//             "Click the link http://127.0.0.1:8000/",
 
-            function ($message) use ($student) {
+//             function ($message) use ($student) {
 
-                $message
-                    ->to($student->email)
-                    ->subject(
-                        'Correction Required for Your Research Proposal'
-                    );
+//                 $message
+//                     ->to($student->email)
+//                     ->subject(
+//                         'Correction Required for Your Research Proposal'
+//                     );
 
-            }
+//             }
 
-        );
+//         );
 
-    } catch (\Throwable $e) {
+//     } catch (\Throwable $e) {
 
-        echo $e;
+//         echo $e;
 
-    }
+//     }
 
-}
+// }
 
 
 /*
