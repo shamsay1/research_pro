@@ -416,7 +416,10 @@
                         </th>
 
                         <th>
-                            Document
+                            Submited research
+                        </th>
+                        <th>
+                            All researches
                         </th>
 
                         <th>
@@ -558,6 +561,35 @@
         <i class="bi bi-eye"></i>
 
         View
+
+    </a>
+
+@else
+
+    <span class="no-research">
+
+        -
+
+    </span>
+
+@endif
+
+                            </td>
+                            <td>
+
+                               @if($research && $research->document)
+
+    <a
+        href="{{ route(
+            'student.research.responses1',
+            $student->id
+        ) }}"
+        class="document-btn"
+    >
+
+        <i class="bi bi-eye"></i>
+
+        all researches
 
     </a>
 

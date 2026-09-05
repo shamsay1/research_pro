@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\MysupervisorController;
 use App\Http\Controllers\ResearchProposalController;
 use App\Http\Controllers\ResearchReportController;
 use App\Http\Controllers\SettingsController;
@@ -107,7 +108,11 @@ Route::post(
     '/supervisor/research/{research}/correction',
     [ResearchProposalController::class, 'requestCorrection']
 )->name('supervisor.research.correction');
-
+Route::post(
+    '/admin/research/{research}/add-correction',
+    [ResearchProposalController::class, 'adminAddCorrection']
+)
+->name('admin.research.addCorrection');
 Route::get(
     '/supervisor/research/{research}/download',
     [ResearchProposalController::class, 'download']
@@ -116,6 +121,10 @@ Route::get(
         '/student/research/responses',
         [ResearchProposalController::class, 'responses']
     )->name('student.research.responses');
+Route::get(
+        '/student/research/responses1/{id}',
+        [ResearchProposalController::class, 'responses1']
+    )->name('student.research.responses1');
 
 
 
@@ -174,5 +183,18 @@ Route::post( '/student/chat/send', [ChatController::class, 'sendMessage'] )->nam
 Route::get( '/admin/chats', [ChatController::class, 'adminChats'] )->name('admin.chats'); // Fungua chat ya student mmoja 
 Route::get( '/admin/chat/{studentId}', [ChatController::class, 'adminChat'] )->name('admin.chat'); 
 // Admin send message 
+Route::post('/notifications/clear-all', [
+    UserController::class,
+    'clearAll'
+])->name('notifications.clearAll');
 Route::post( '/admin/chat/{studentId}/send', [ChatController::class, 'adminSendMessage'] )->name('admin.chat.send');
- // =============================== // STUDENT // =============================== Route::resource( '/student', StudentController::class );
+ Route::get(
+    '/admin/research/student/{student}/print',
+    [ResearchProposalController::class, 'printStudentResearchReport']
+)->name('admin.research.student.print');
+Route::get(
+        '/supervisorsall',
+        [MysupervisorController::class, 'mysupervisor']
+    )->name('supervisors1');
+// =============================== // STUDENT // =============================== 
+// Route::resource( '/student', StudentController::class );

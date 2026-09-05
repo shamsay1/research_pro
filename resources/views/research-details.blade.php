@@ -830,7 +830,6 @@ textarea.form-control{
     enctype="multipart/form-data"
 >
 
-```
 @csrf
 
 
@@ -844,8 +843,6 @@ textarea.form-control{
 
         Write corrections for the student
 
-        <span class="text-danger">*</span>
-
     </label>
 
 
@@ -854,7 +851,7 @@ textarea.form-control{
         class="form-control"
         rows="6"
         placeholder="Write the corrections the student needs to make..."
-        required
+
     >{{ old('comment') }}</textarea>
 
 
@@ -928,7 +925,7 @@ textarea.form-control{
 {{-- ========================================================= --}}
 {{-- SUBMIT --}}
 {{-- ========================================================= --}}
-
+<br>
 <button
     type="submit"
     class="btn btn-danger"
@@ -939,7 +936,7 @@ textarea.form-control{
     Send Correction to Student
 
 </button>
-```
+
 
 </form>
 

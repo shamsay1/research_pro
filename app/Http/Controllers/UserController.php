@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use App\Models\ResearchProposal;
 use App\Models\Student;
 use App\Models\SupervisorAssignment;
@@ -148,6 +149,19 @@ class UserController extends Controller
     |--------------------------------------------------------------------------
     */
 
+    public function clearAll()
+{
+    $user = Auth::guard('web')->user();
+
+    Notification::where('supervisor_id', $user->id)
+        ->where('is_read', 0)
+        ->update([
+            'is_read' => 1
+        ]);
+
+    return back();
+}
+
     public function researchDetails($studentId)
     {
         /*
@@ -167,7 +181,7 @@ class UserController extends Controller
 
         $assignment = SupervisorAssignment::with([
             'student',
-            'teacher'
+            'supervisor'
         ])
         ->where(
             'student_id',

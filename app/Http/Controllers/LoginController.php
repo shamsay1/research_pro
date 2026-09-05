@@ -12,518 +12,547 @@ class LoginController extends Controller
     public function showlogin(){
         return view('login');
     }
-   
-    public function dashboard()
-    {
+
+public function dashboard()
+{
+    /*
+    |--------------------------------------------------------------------------
+    | CHECK LOGGED IN USER
+    |--------------------------------------------------------------------------
+    */
+
+    $user = null;
+    $role = null;
+    $guard = null;
+
+    // System User: Admin / Supervisor / Teacher
+    if (Auth::guard('web')->check()) {
+
+        $user = Auth::guard('web')->user();
+        $role = $user->role;
+        $guard = 'web';
+
+    }
+
+    // Student
+    elseif (Auth::guard('student')->check()) {
+
+        $user = Auth::guard('student')->user();
+        $role = 'student';
+        $guard = 'student';
+
+    }
+
+    // Hakuna aliye-login
+    else {
+
+        return redirect()->route('login');
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | DEFAULT VALUES
+    |--------------------------------------------------------------------------
+    */
+
+    $researchProjects = 0;
+    $registeredStudents = 0;
+    $supervisors = 0;
+    $completedResearch = 0;
+
+    $recentResearch = collect();
+
+    $completed = 0;
+    $inProgress = 0;
+    $pending = 0;
+
+    $completedPercentage = 0;
+    $inProgressPercentage = 0;
+    $pendingPercentage = 0;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ADMIN DASHBOARD
+    |--------------------------------------------------------------------------
+    */
+
+    if ($role === 'admin') {
+
         /*
         |--------------------------------------------------------------------------
-        | CHECK LOGGED IN USER
+        | TOTAL RESEARCH PROJECTS
         |--------------------------------------------------------------------------
         */
 
-        $user = null;
-        $role = null;
-        $guard = null;
-
-        // System User: Admin / Supervisor / Teacher
-        if (Auth::guard('web')->check()) {
-
-            $user = Auth::guard('web')->user();
-            $role = $user->role;
-            $guard = 'web';
-
-        }
-
-        // Student
-        elseif (Auth::guard('student')->check()) {
-
-            $user = Auth::guard('student')->user();
-            $role = 'student';
-            $guard = 'student';
-
-        }
-
-        // Hakuna aliye-login
-        else {
-
-            return redirect()->route('login');
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | DEFAULT VALUES
-        |--------------------------------------------------------------------------
-        */
-
-        $researchProjects = 0;
-        $registeredStudents = 0;
-        $supervisors = 0;
-        $completedResearch = 0;
-
-        $recentResearch = collect();
-
-        $completed = 0;
-        $inProgress = 0;
-        $pending = 0;
-
-        $completedPercentage = 0;
-        $inProgressPercentage = 0;
-        $pendingPercentage = 0;
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | ADMIN DASHBOARD
-        |--------------------------------------------------------------------------
-        */
-
-        if ($role === 'admin') {
-
-            /*
-            | Total Research Projects
-            */
-
-            $researchProjects = DB::table('research_proposals')
-                ->count();
-
-
-            /*
-            | Total Students
-            */
-
-            $registeredStudents = DB::table('students')
-                ->count();
-
-
-            /*
-            | Total Supervisors
-            */
-
-            $supervisors = DB::table('system_users')
-                ->where('role', 'supervisors')
-                ->count();
-
-
-            /*
-            | Completed Research
-            */
-
-            $completedResearch = DB::table('research_proposals')
-                ->where('status', 'approved')
-                ->count();
-
-
-            /*
-            | Recent Research
-            */
-
-            $recentResearch = DB::table('research_proposals')
-                ->join(
-                    'students',
-                    'research_proposals.student_id',
-                    '=',
-                    'students.id'
-                )
-                ->select(
-                    'research_proposals.id',
-                    'research_proposals.title',
-                    'research_proposals.status',
-                    'students.firstname',
-                    'students.lastname'
-                )
-                ->orderBy(
-                    'research_proposals.created_at',
-                    'desc'
-                )
-                ->limit(5)
-                ->get();
-
-
-            /*
-            | Research Status
-            */
-
-            $completed = DB::table('research_proposals')
-                ->where('status', 'approved')
-                ->count();
-
-            $inProgress = DB::table('research_proposals')
-                ->where('status', 'under_review')
-                ->count();
-
-            $pending = DB::table('research_proposals')
-                ->where('status', 'pending')
-                ->count();
-
-        }
+        $researchProjects = DB::table('research_proposals')
+            ->count();
 
 
         /*
         |--------------------------------------------------------------------------
-        | SUPERVISOR DASHBOARD
+        | TOTAL STUDENTS
         |--------------------------------------------------------------------------
         */
 
-        elseif ($role === 'supervisors') {
-
-            /*
-            | Students assigned to this supervisor
-            */
-
-            $registeredStudents = DB::table('supervisor_assignments')
-                ->where('teacher_id', $user->id)
-                ->where('status', 'active')
-                ->count();
-
-
-            /*
-            | Research Projects assigned to this supervisor
-            */
-
-            $researchProjects = DB::table('research_proposals')
-                ->join(
-                    'supervisor_assignments',
-                    'research_proposals.student_id',
-                    '=',
-                    'supervisor_assignments.student_id'
-                )
-                ->where(
-                    'supervisor_assignments.teacher_id',
-                    $user->id
-                )
-                ->where(
-                    'supervisor_assignments.status',
-                    'active'
-                )
-                ->count();
-
-
-            /*
-            | Supervisor count
-            */
-
-            $supervisors = 1;
-
-
-            /*
-            | Completed Research
-            */
-
-            $completedResearch = DB::table('research_proposals')
-                ->join(
-                    'supervisor_assignments',
-                    'research_proposals.student_id',
-                    '=',
-                    'supervisor_assignments.student_id'
-                )
-                ->where(
-                    'supervisor_assignments.teacher_id',
-                    $user->id
-                )
-                ->where(
-                    'supervisor_assignments.status',
-                    'active'
-                )
-                ->where(
-                    'research_proposals.status',
-                    'approved'
-                )
-                ->count();
-
-
-            /*
-            | Recent Research
-            */
-
-            $recentResearch = DB::table('research_proposals')
-                ->join(
-                    'students',
-                    'research_proposals.student_id',
-                    '=',
-                    'students.id'
-                )
-                ->join(
-                    'supervisor_assignments',
-                    'research_proposals.student_id',
-                    '=',
-                    'supervisor_assignments.student_id'
-                )
-                ->where(
-                    'supervisor_assignments.teacher_id',
-                    $user->id
-                )
-                ->where(
-                    'supervisor_assignments.status',
-                    'active'
-                )
-                ->select(
-                    'research_proposals.id',
-                    'research_proposals.title',
-                    'research_proposals.status',
-                    'students.firstname',
-                    'students.lastname'
-                )
-                ->orderBy(
-                    'research_proposals.created_at',
-                    'desc'
-                )
-                ->limit(5)
-                ->get();
-
-
-            /*
-            | Research Status
-            */
-
-            $completed = DB::table('research_proposals')
-                ->join(
-                    'supervisor_assignments',
-                    'research_proposals.student_id',
-                    '=',
-                    'supervisor_assignments.student_id'
-                )
-                ->where(
-                    'supervisor_assignments.teacher_id',
-                    $user->id
-                )
-                ->where(
-                    'supervisor_assignments.status',
-                    'active'
-                )
-                ->where(
-                    'research_proposals.status',
-                    'completed'
-                )
-                ->count();
-
-
-            $inProgress = DB::table('research_proposals')
-                ->join(
-                    'supervisor_assignments',
-                    'research_proposals.student_id',
-                    '=',
-                    'supervisor_assignments.student_id'
-                )
-                ->where(
-                    'supervisor_assignments.teacher_id',
-                    $user->id
-                )
-                ->where(
-                    'supervisor_assignments.status',
-                    'active'
-                )
-                ->where(
-                    'research_proposals.status',
-                    'under_review'
-                )
-                ->count();
-
-
-            $pending = DB::table('research_proposals')
-                ->join(
-                    'supervisor_assignments',
-                    'research_proposals.student_id',
-                    '=',
-                    'supervisor_assignments.student_id'
-                )
-                ->where(
-                    'supervisor_assignments.teacher_id',
-                    $user->id
-                )
-                ->where(
-                    'supervisor_assignments.status',
-                    'active'
-                )
-                ->where(
-                    'research_proposals.status',
-                    'pending'
-                )
-                ->count();
-
-        }
+        $registeredStudents = DB::table('students')
+            ->count();
 
 
         /*
         |--------------------------------------------------------------------------
-        | STUDENT DASHBOARD
+        | TOTAL SUPERVISORS
         |--------------------------------------------------------------------------
         */
 
-        elseif ($role === 'student') {
-
-            /*
-            | Student ID
-            */
-
-            $studentId = $user->id;
-
-
-            /*
-            | Student has one profile
-            */
-
-            $registeredStudents = 1;
-
-
-            /*
-            | Student's Research Projects
-            */
-
-            $researchProjects = DB::table('research_proposals')
-                ->where(
-                    'student_id',
-                    $studentId
-                )
-                ->count();
-
-
-            /*
-            | Student's Supervisor
-            */
-
-            $supervisors = DB::table('supervisor_assignments')
-                ->where(
-                    'student_id',
-                    $studentId
-                )
-                ->where(
-                    'status',
-                    'active'
-                )
-                ->count();
-
-
-            /*
-            | Completed Research
-            */
-
-            $completedResearch = DB::table('research_proposals')
-                ->where(
-                    'student_id',
-                    $studentId
-                )
-                ->where(
-                    'status',
-                    'completed'
-                )
-                ->count();
-
-
-            /*
-            | Recent Research
-            */
-
-            $recentResearch = DB::table('research_proposals')
-                ->where(
-                    'student_id',
-                    $studentId
-                )
-                ->select(
-                    'id',
-                    'title',
-                    'status'
-                )
-                ->orderBy(
-                    'created_at',
-                    'desc'
-                )
-                ->limit(5)
-                ->get();
-
-
-            /*
-            | Research Status
-            */
-
-            $completed = DB::table('research_proposals')
-                ->where(
-                    'student_id',
-                    $studentId
-                )
-                ->where(
-                    'status',
-                    'approved'
-                )
-                ->count();
-
-
-            $inProgress = DB::table('research_proposals')
-                ->where(
-                    'student_id',
-                    $studentId
-                )
-                ->where(
-                    'status',
-                    'under_review'
-                )
-                ->count();
-
-
-            $pending = DB::table('research_proposals')
-                ->where(
-                    'student_id',
-                    $studentId
-                )
-                ->where(
-                    'status',
-                    'pending'
-                )
-                ->count();
-
-        }
+        $supervisors = DB::table('system_users')
+            ->where('role', 'supervisors')
+            ->count();
 
 
         /*
         |--------------------------------------------------------------------------
-        | UNKNOWN ROLE
+        | COMPLETED RESEARCH
         |--------------------------------------------------------------------------
+        |
+        | Tunatumia completed kama status kuu ya completion.
+        | approved pia inahesabiwa kama completed.
+        |
         */
 
-        else {
-
-            abort(403, 'Unauthorized role.');
-
-        }
+        $completedResearch = DB::table('research_proposals')
+            ->whereIn('status', ['completed', 'approved'])
+            ->count();
 
 
         /*
         |--------------------------------------------------------------------------
-        | CALCULATE PERCENTAGES
+        | RECENT RESEARCH PROJECTS
         |--------------------------------------------------------------------------
         */
 
-        $totalResearch =
-            $completed +
-            $inProgress +
-            $pending;
-
-
-        if ($totalResearch > 0) {
-
-            $completedPercentage =
-                round(($completed / $totalResearch) * 100);
-
-            $inProgressPercentage =
-                round(($inProgress / $totalResearch) * 100);
-
-            $pendingPercentage =
-                round(($pending / $totalResearch) * 100);
-
-        }
+        $recentResearch = DB::table('research_proposals')
+            ->join(
+                'students',
+                'research_proposals.student_id',
+                '=',
+                'students.id'
+            )
+            ->select(
+                'research_proposals.id',
+                'research_proposals.title',
+                'research_proposals.status',
+                'research_proposals.created_at',
+                'students.firstname',
+                'students.lastname'
+            )
+            ->orderBy(
+                'research_proposals.created_at',
+                'desc'
+            )
+            ->limit(5)
+            ->get();
 
 
         /*
         |--------------------------------------------------------------------------
-        | RETURN DASHBOARD
+        | RESEARCH STATUS
         |--------------------------------------------------------------------------
         */
 
-        return view('dashboard', compact(
+        $completed = DB::table('research_proposals')
+            ->whereIn('status', ['completed', 'approved'])
+            ->count();
+
+
+        $inProgress = DB::table('research_proposals')
+            ->whereIn('status', [
+                'under_review',
+                'in_progress'
+            ])
+            ->count();
+
+
+        $pending = DB::table('research_proposals')
+            ->whereIn('status', [
+                'pending',
+                'correction'
+            ])
+            ->count();
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SUPERVISOR DASHBOARD
+    |--------------------------------------------------------------------------
+    */
+
+    elseif ($role === 'supervisors') {
+
+        /*
+        |--------------------------------------------------------------------------
+        | GET STUDENTS ASSIGNED TO THIS SUPERVISOR
+        |--------------------------------------------------------------------------
+        */
+
+        $studentIds = DB::table('supervisor_assignments')
+            ->where('teacher_id', $user->id)
+            ->where('status', 'active')
+            ->pluck('student_id')
+            ->unique();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MY STUDENTS
+        |--------------------------------------------------------------------------
+        */
+
+        $registeredStudents = $studentIds->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RESEARCH PROJECTS FOR MY STUDENTS
+        |--------------------------------------------------------------------------
+        */
+
+        $researchProjects = DB::table('research_proposals')
+            ->whereIn(
+                'student_id',
+                $studentIds
+            )
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SUPERVISOR COUNT
+        |--------------------------------------------------------------------------
+        */
+
+        $supervisors = 1;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | COMPLETED RESEARCH
+        |--------------------------------------------------------------------------
+        */
+
+        $completedResearch = DB::table('research_proposals')
+            ->whereIn(
+                'student_id',
+                $studentIds
+            )
+            ->whereIn(
+                'status',
+                ['completed', 'approved']
+            )
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RECENT STUDENT RESEARCH
+        |--------------------------------------------------------------------------
+        */
+
+        $recentResearch = DB::table('research_proposals')
+            ->join(
+                'students',
+                'research_proposals.student_id',
+                '=',
+                'students.id'
+            )
+            ->whereIn(
+                'research_proposals.student_id',
+                $studentIds
+            )
+            ->select(
+                'research_proposals.id',
+                'research_proposals.title',
+                'research_proposals.status',
+                'research_proposals.created_at',
+                'students.firstname',
+                'students.lastname'
+            )
+            ->orderBy(
+                'research_proposals.created_at',
+                'desc'
+            )
+            ->limit(5)
+            ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | RESEARCH STATUS
+        |--------------------------------------------------------------------------
+        */
+
+        $completed = DB::table('research_proposals')
+            ->whereIn(
+                'student_id',
+                $studentIds
+            )
+            ->whereIn(
+                'status',
+                ['completed', 'approved']
+            )
+            ->count();
+
+
+        $inProgress = DB::table('research_proposals')
+            ->whereIn(
+                'student_id',
+                $studentIds
+            )
+            ->whereIn(
+                'status',
+                [
+                    'under_review',
+                    'in_progress'
+                ]
+            )
+            ->count();
+
+
+        $pending = DB::table('research_proposals')
+            ->whereIn(
+                'student_id',
+                $studentIds
+            )
+            ->whereIn(
+                'status',
+                [
+                    'pending',
+                    'correction'
+                ]
+            )
+            ->count();
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | STUDENT DASHBOARD
+    |--------------------------------------------------------------------------
+    */
+
+    elseif ($role === 'student') {
+
+        /*
+        |--------------------------------------------------------------------------
+        | STUDENT ID
+        |--------------------------------------------------------------------------
+        */
+
+        $studentId = $user->id;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | STUDENT PROFILE
+        |--------------------------------------------------------------------------
+        */
+
+        $registeredStudents = 1;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MY RESEARCH PROJECTS
+        |--------------------------------------------------------------------------
+        */
+
+        $researchProjects = DB::table('research_proposals')
+            ->where(
+                'student_id',
+                $studentId
+            )
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MY SUPERVISOR
+        |--------------------------------------------------------------------------
+        */
+
+        $supervisors = DB::table('supervisor_assignments')
+            ->where(
+                'student_id',
+                $studentId
+            )
+            ->where(
+                'status',
+                'active'
+            )
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | COMPLETED RESEARCH
+        |--------------------------------------------------------------------------
+        */
+
+        $completedResearch = DB::table('research_proposals')
+            ->where(
+                'student_id',
+                $studentId
+            )
+            ->whereIn(
+                'status',
+                ['completed', 'approved']
+            )
+            ->count();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MY RECENT RESEARCH PROJECTS
+        |--------------------------------------------------------------------------
+        */
+
+        $recentResearch = DB::table('research_proposals')
+            ->where(
+                'student_id',
+                $studentId
+            )
+            ->select(
+                'id',
+                'title',
+                'status',
+                'created_at'
+            )
+            ->orderBy(
+                'created_at',
+                'desc'
+            )
+            ->limit(5)
+            ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MY RESEARCH STATUS
+        |--------------------------------------------------------------------------
+        */
+
+        $completed = DB::table('research_proposals')
+            ->where(
+                'student_id',
+                $studentId
+            )
+            ->whereIn(
+                'status',
+                ['completed', 'approved']
+            )
+            ->count();
+
+
+        $inProgress = DB::table('research_proposals')
+            ->where(
+                'student_id',
+                $studentId
+            )
+            ->whereIn(
+                'status',
+                [
+                    'under_review',
+                    'in_progress'
+                ]
+            )
+            ->count();
+
+
+        $pending = DB::table('research_proposals')
+            ->where(
+                'student_id',
+                $studentId
+            )
+            ->whereIn(
+                'status',
+                [
+                    'pending',
+                    'correction'
+                ]
+            )
+            ->count();
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | UNKNOWN ROLE
+    |--------------------------------------------------------------------------
+    */
+
+    else {
+
+        abort(
+            403,
+            'Unauthorized role.'
+        );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CALCULATE RESEARCH STATUS PERCENTAGES
+    |--------------------------------------------------------------------------
+    */
+
+    $totalResearch =
+        $completed +
+        $inProgress +
+        $pending;
+
+
+    if ($totalResearch > 0) {
+
+        $completedPercentage =
+            round(
+                ($completed / $totalResearch) * 100
+            );
+
+
+        $inProgressPercentage =
+            round(
+                ($inProgress / $totalResearch) * 100
+            );
+
+
+        $pendingPercentage =
+            round(
+                ($pending / $totalResearch) * 100
+            );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RETURN DASHBOARD
+    |--------------------------------------------------------------------------
+    */
+
+    return view(
+        'dashboard',
+        compact(
             'user',
             'role',
             'guard',
+
             'researchProjects',
             'registeredStudents',
             'supervisors',
@@ -538,8 +567,11 @@ class LoginController extends Controller
             'completedPercentage',
             'inProgressPercentage',
             'pendingPercentage'
-        ));
-    }
+        )
+    );
+}
+
+
 
     public function login(Request $request)
     {

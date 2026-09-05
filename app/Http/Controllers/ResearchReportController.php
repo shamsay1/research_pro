@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\ResearchProposal;
 use App\Models\ResearchCorrection;
+use App\Models\SupervisorAssignment;
 use App\Models\SystemUser;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ResearchReportController extends Controller
 {
@@ -30,11 +32,6 @@ class ResearchReportController extends Controller
     ])
     ->orderBy('created_at', 'asc');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Search
-    |--------------------------------------------------------------------------
-    */
 
     if ($search) {
 
@@ -71,31 +68,16 @@ class ResearchReportController extends Controller
 
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Paginate Research
-    |--------------------------------------------------------------------------
-    */
 
     $researches = $query
         ->paginate(50)
         ->withQueryString();
 
-    /*
-    |--------------------------------------------------------------------------
-    | Group by Student
-    |--------------------------------------------------------------------------
-    */
 
     $groupedResearches = $researches
         ->getCollection()
         ->groupBy('student_id');
 
-    /*
-    |--------------------------------------------------------------------------
-    | Statistics
-    |--------------------------------------------------------------------------
-    */
 
     $totalResearch = ResearchProposal::count();
 
@@ -127,5 +109,7 @@ class ResearchReportController extends Controller
         )
     );
 }
+
+
 }
 

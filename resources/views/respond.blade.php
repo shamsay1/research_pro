@@ -555,7 +555,7 @@
 
                                             <i class="bi bi-person-badge me-1"></i>
 
-                                            Supervisor:
+                                            Response from:{{ $correction->supervisor->firstname }} {{ $correction->supervisor->midddlename }} | {{ $correction->supervisor->role }}
 
                                             @if($correction->supervisor)
 

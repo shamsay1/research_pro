@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Models\SupervisorAssignment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
@@ -69,4 +71,5 @@ class StudentController extends Controller
             ->route('staff.index')
             ->with('success', 'Staff deleted successfully.');
     }
+      
 }

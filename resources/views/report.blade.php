@@ -952,13 +952,24 @@ function timeDifference($from, $to)
 
 <div>
 
-<span class="badge bg-primary">
+<div class="d-flex align-items-center gap-2">
 
-    {{ $studentResearches->count() }}
+    <span class="badge bg-primary">
+        {{ $studentResearches->count() }}
+        {{ $studentResearches->count() == 1 ? 'Research' : 'Researches' }}
+    </span>
 
-    Research
+    <a
+        href="{{ route('admin.research.student.print', $student->id) }}"
+        target="_blank"
+        class="btn btn-sm btn-success"
+        onclick="event.stopPropagation();"
+    >
+        <i class="bi bi-eye"></i>
+        View report
+    </a>
 
-</span>
+</div>
 
 </div>
 
@@ -984,7 +995,18 @@ function timeDifference($from, $to)
 
 
 <div class="accordion-body">
+<div class="d-flex justify-content-end mb-4">
 
+    <a
+        href="{{ route('admin.research.student.print', $student->id) }}"
+        target="_blank"
+        class="btn btn-success"
+    >
+        <i class="bi bi-printer-fill me-1"></i>
+        Print Student Research Summary
+    </a>
+
+</div>
 
 
 {{-- =====================================================

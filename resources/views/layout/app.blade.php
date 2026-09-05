@@ -658,8 +658,13 @@
         <!-- Header -->
 
         <div class="sidebar-header">
-
+            @if(Auth::guard('web')->check() && Auth::guard('web')->user()->role === 'admin')
             <span>Admin</span>
+            @elseif(Auth::guard('web')->check() && Auth::guard('web')->user()->role === 'supervisors')
+            <span>Supervisor</span>
+            @else
+            <span>Student</span>
+            @endif
 
         </div>
 
@@ -767,7 +772,7 @@
 
         <i class="bi bi-journal-text"></i>
 
-        <span>Research</span>
+        <span>Researches</span>
 
     </a>
 
@@ -779,12 +784,18 @@
     {{-- =====================================================
          STUDENT
     ====================================================== --}}
+    <a href="{{ route('supervisors1') }}">
 
+        <i class="bi bi-people"></i>
+
+        <span>My supervisors</span>
+
+    </a>
     <a href="{{ route('student.research') }}">
 
         <i class="bi bi-file-earmark-text-fill"></i>
 
-        <span>Proposal</span>
+        <span>Submittion</span>
 
     </a>
 
@@ -796,6 +807,7 @@
         <span>Responses</span>
 
     </a>
+    
     <a href="{{ route('student.chat') }}">
 
         <i class="bi bi-chat-left-text-fill"></i>
@@ -1014,12 +1026,20 @@
             <!-- Footer -->
             <div class="p-2 text-center border-top">
 
-                <a
-                    href=""
-                    class="text-decoration-none small"
-                >
-                    View all notifications
-                </a>
+                <form
+    action="{{ route('notifications.clearAll') }}"
+    method="POST"
+    class="d-inline"
+>
+    @csrf
+
+    <button
+        type="submit"
+        class="btn btn-link text-decoration-none small p-0"
+    >
+        Clear all
+    </button>
+</form>
 
             </div>
 
@@ -1035,7 +1055,16 @@
         <i class="bi bi-person-circle fs-5"></i>
 
         <span class="d-none d-sm-inline">
-            {{ Auth::guard('web')->user()->firstname ?? 'Admin' }}
+            @if (Auth::guard('web')->check() &&
+            Auth::guard('web')->user()->role === 'admin')
+            {{ Auth::guard('web')->user()->firstname.'    '.Auth::guard('web')->user()->middlename  }}
+            @elseif (Auth::guard('web')->check() &&
+            Auth::guard('web')->user()->role === 'supervisors')
+            {{ Auth::guard('web')->user()->firstname.'    '.Auth::guard('web')->user()->middlename  }}
+            @else
+              {{ Auth::guard('student')->user()->firstname.'  '.Auth::guard('student')->user()->middlename }}
+
+            @endif
         </span>
 
     </div>

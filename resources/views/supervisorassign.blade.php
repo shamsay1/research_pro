@@ -440,7 +440,7 @@
     </h4>
 
     <p>
-        Manage Core and Principal Supervisors assigned to students
+        Manage CO and Principal Supervisors assigned to students
     </p>
 
 </div>
@@ -895,7 +895,7 @@
 
                                                 <div class="supervisor-role">
 
-                                                    Core Supervisor
+                                                    CO/Supervisor
 
                                                 </div>
 
@@ -1275,7 +1275,7 @@
                     <i class="bi bi-info-circle me-1"></i>
 
                     Each student must have exactly two supervisors:
-                    <strong>one Core Supervisor</strong>
+                    <strong>one CO/Supervisor</strong>
                     and
                     <strong>one Principal Supervisor</strong>.
 
@@ -1341,53 +1341,6 @@
 
                 </div>
 
-
-
-                {{-- CORE SUPERVISOR --}}
-
-                <div class="mb-3">
-
-                    <label class="form-label">
-
-                        Core Supervisor
-
-                    </label>
-
-
-                    <select
-                        name="core_teacher_id"
-                        class="form-select"
-                        required
-                    >
-
-                        <option value="">
-
-                            Select Core Supervisor
-
-                        </option>
-
-
-                        @foreach($teachers as $teacher)
-
-                            <option
-                                value="{{ $teacher->id }}"
-                                {{ old('core_teacher_id') == $teacher->id ? 'selected' : '' }}
-                            >
-
-                                {{ $teacher->firstname }}
-                                {{ $teacher->middlename }}
-                                {{ $teacher->lastname }}
-
-                            </option>
-
-                        @endforeach
-
-                    </select>
-
-                </div>
-
-
-
                 {{-- PRINCIPAL SUPERVISOR --}}
 
                 <div class="mb-3">
@@ -1432,11 +1385,60 @@
 
                     <small class="text-muted">
 
-                        Core and Principal Supervisors must be different.
+                        CO/supervisor and Principal Supervisors must be different.
 
                     </small>
 
                 </div>
+
+                
+
+
+                {{-- CORE SUPERVISOR --}}
+
+                <div class="mb-3">
+
+                    <label class="form-label">
+
+                        CO/Supervisor
+
+                    </label>
+
+
+                    <select
+                        name="core_teacher_id"
+                        class="form-select"
+                        required
+                    >
+
+                        <option value="">
+
+                            Select CO/Supervisor
+
+                        </option>
+
+
+                        @foreach($teachers as $teacher)
+
+                            <option
+                                value="{{ $teacher->id }}"
+                                {{ old('core_teacher_id') == $teacher->id ? 'selected' : '' }}
+                            >
+
+                                {{ $teacher->firstname }}
+                                {{ $teacher->middlename }}
+                                {{ $teacher->lastname }}
+
+                            </option>
+
+                        @endforeach
+
+                    </select>
+
+                </div>
+
+
+
 
 
             </div>

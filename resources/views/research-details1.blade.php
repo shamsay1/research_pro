@@ -305,6 +305,167 @@
         Back
 
     </a>
+    <button
+    type="button"
+    class="btn btn-warning"
+    data-bs-toggle="modal"
+    data-bs-target="#addCorrectionModal"
+>
+    <i class="bi bi-chat-left-text me-1"></i>
+    Add Comments
+</button>
+<div
+    class="modal fade"
+    id="addCorrectionModal"
+    tabindex="-1"
+    aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title">
+                    <i class="bi bi-chat-left-text me-2"></i>
+                    Add Research Comments
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                ></button>
+
+            </div>
+
+
+            <form
+                action="{{ route(
+                    'admin.research.addCorrection',
+                    $research->id
+                ) }}"
+                method="POST"
+                enctype="multipart/form-data"
+            >
+
+                @csrf
+
+
+                <div class="modal-body">
+
+                    {{-- RESEARCH TITLE --}}
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+                            Research Title
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            value="{{ $research->title }}"
+                            readonly
+                        >
+
+                    </div>
+
+
+                    {{-- COMMENT --}}
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+                         
+                        </label>
+
+                        <textarea
+                            name="comment"
+                            class="form-control"
+                            rows="6"
+                            placeholder="Write your correction comments here..."
+                       
+                        >{{ old('comment') }}</textarea>
+
+                        @error('comment')
+
+                            <small class="text-danger">
+                                {{ $message }}
+                            </small>
+
+                        @enderror
+
+                    </div>
+
+
+                    {{-- DOCUMENT --}}
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-semibold">
+                            Correction Document
+                         
+                        </label>
+
+                        <input
+                            type="file"
+                            name="attachment"
+                            class="form-control"
+                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                          
+                        >
+
+                        <small class="text-muted">
+                            PDF, DOC, DOCX, JPG, JPEG or PNG.
+                            Maximum size: 10MB.
+                        </small>
+
+                        @error('attachment')
+
+                            <small class="text-danger d-block">
+                                {{ $message }}
+                            </small>
+
+                        @enderror
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Cancel
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+
+                        <i class="bi bi-send me-1"></i>
+
+                        Send Correction
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
 
 </div>
 
@@ -409,11 +570,11 @@
 
                 <span class="info-value">
 
-                    {{ $assignment->teacher->firstname }}
+                    {{ $assignment->supervisor->firstname }}
 
-                    {{ $assignment->teacher->middlename }}
+                    {{ $assignment->supervisor->middlename }}
 
-                    {{ $assignment->teacher->lastname }}
+                    {{ $assignment->supervisor->lastname }}
 
                 </span>
 
