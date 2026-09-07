@@ -630,7 +630,7 @@
         $notifications = App\Models\Notification::where(
             'supervisor_id',
             $user->id
-        )
+        )->where('is_read',false)
         ->latest()
         ->get();
 
@@ -673,7 +673,7 @@
 
         <a
             href="/dashboard"
-            class="active"
+            class="{{ Route::currentRouteName() == 'dashboard' ? 'active' : '' }}"
         >
 
             <i class="bi bi-speedometer2"></i>
@@ -759,7 +759,7 @@
          SUPERVISOR
     ====================================================== --}}
 
-    <a href="{{ route('supervisor.students') }}">
+    <a href="{{ route('supervisor.students') }}" class="{{ Route::currentRouteName() == 'supervisor.students' ? 'active' : '' }}">
 
         <i class="bi bi-people-fill"></i>
 
@@ -768,7 +768,7 @@
     </a>
 
 
-    <a href="{{ route('supervisor.research') }}">
+    <a href="{{ route('supervisor.research') }}" class="{{ Route::currentRouteName() == 'supervisor.research' ? 'active' : '' }}">
 
         <i class="bi bi-journal-text"></i>
 
@@ -784,23 +784,23 @@
     {{-- =====================================================
          STUDENT
     ====================================================== --}}
-    <a href="{{ route('supervisors1') }}">
+    <a href="{{ route('supervisors1') }}" class="{{ Route::currentRouteName() == 'supervisors1' ? 'active' : '' }}">
 
         <i class="bi bi-people"></i>
 
         <span>My supervisors</span>
 
     </a>
-    <a href="{{ route('student.research') }}">
+    <a href="{{ route('student.research') }}" class="{{ Route::currentRouteName() == 'student.research' ? 'active' : '' }}">
 
         <i class="bi bi-file-earmark-text-fill"></i>
 
-        <span>Submittion</span>
+        <span>Submission</span>
 
     </a>
 
 
-    <a href="{{ route('student.research.responses') }}">
+    <a href="{{ route('student.research.responses') }}" class="{{ Route::currentRouteName() == 'student.research.responses' ? 'active' : '' }}">
 
         <i class="bi bi-chat-left-text-fill"></i>
 
@@ -808,7 +808,7 @@
 
     </a>
     
-    <a href="{{ route('student.chat') }}">
+    <a href="{{ route('student.chat') }}" class="{{ Route::currentRouteName() == 'student.chat' ? 'active' : '' }}">
 
         <i class="bi bi-chat-left-text-fill"></i>
 
@@ -821,7 +821,7 @@
 @endif
 
         <!-- Logout -->
-        <a href="{{ route('settings') }}">
+        <a href="{{ route('settings') }}" class="{{ Route::currentRouteName() == 'settings' ? 'active' : '' }}">
 
             <i class="bi bi-people-fill"></i>
 

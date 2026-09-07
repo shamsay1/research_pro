@@ -52,10 +52,21 @@
 .upload-box{
     border:2px dashed #cbd5e1;
     border-radius:10px;
-    padding:25px;
+    padding:35px 25px;
     text-align:center;
     background:#f8fafc;
     cursor:pointer;
+    transition:all .2s ease;
+}
+
+.upload-box.dragover{
+    border-color:#2563eb;
+    background:#eff6ff;
+    transform:scale(1.01);
+}
+
+.upload-box.dragover .upload-icon{
+    transform:scale(1.15);
 }
 
 .upload-box:hover{
@@ -468,16 +479,14 @@
                         </div>
 
                         <div class="upload-text">
+                 Drag & Drop your research document here
+                    <br>
+                    <span>or click to browse</span>
+                </div>
 
-                            Click here to upload your research
-
-                        </div>
-
-                        <div class="upload-info">
-
-                            PDF, DOC or DOCX 
-
-                        </div>
+                <div class="upload-info">
+                    PDF, DOC or DOCX
+                </div>
 
                     </label>
 
@@ -704,7 +713,7 @@
 
                         <div class="upload-info">
 
-                            PDF, DOC or DOCX — Maximum 10MB
+                            PDF, DOC or DOCX 
 
                         </div>
 
@@ -980,7 +989,91 @@ function showFileName(input)
     }
 }
 
+/*
+|--------------------------------------------------------------------------
+| Drag & Drop File Upload
+|--------------------------------------------------------------------------
+*/
 
+document.addEventListener('DOMContentLoaded', function () {
+
+    const uploadBoxes = document.querySelectorAll('.upload-box');
+
+    uploadBoxes.forEach(function(uploadBox) {
+
+        const inputId = uploadBox.getAttribute('for');
+        const input = document.getElementById(inputId);
+
+        if (!input) return;
+
+        // Prevent browser from opening the file
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadBox.addEventListener(eventName, function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        // Highlight box
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadBox.addEventListener(eventName, function() {
+                uploadBox.classList.add('dragover');
+            });
+        });
+
+        // Remove highlight
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadBox.addEventListener(eventName, function() {
+                uploadBox.classList.remove('dragover');
+            });
+        });
+
+        // Handle dropped file
+        uploadBox.addEventListener('drop', function(e) {
+
+            const files = e.dataTransfer.files;
+
+            if (files.length === 0) return;
+
+            const file = files[0];
+
+            // Allowed extensions
+            const allowedExtensions = [
+                'pdf',
+                'doc',
+                'docx'
+            ];
+
+            const extension = file.name
+                .split('.')
+                .pop()
+                .toLowerCase();
+
+            if (!allowedExtensions.includes(extension)) {
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid File',
+                    text: 'Please upload PDF, DOC or DOCX file.'
+                });
+
+                return;
+            }
+
+            // Put dropped file into input
+            const dataTransfer = new DataTransfer();
+
+            dataTransfer.items.add(file);
+
+            input.files = dataTransfer.files;
+
+            // Show file name
+            showFileName(input);
+        });
+
+    });
+
+});
 /*
 |--------------------------------------------------------------------------
 | Open confirmation modal

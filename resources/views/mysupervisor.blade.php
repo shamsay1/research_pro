@@ -363,7 +363,7 @@
         </h4>
 
         <p>
-            View your assigned CO/Supervisor and Principal Supervisor.
+            View your assigned Co-Supervisor and Principal Supervisor.
         </p>
 
     </div>
@@ -440,199 +440,6 @@
     ====================================================== --}}
 
     <div class="supervisor-grid">
-
-
-        {{-- =================================================
-             CORE SUPERVISOR
-        ================================================== --}}
-
-        <div class="supervisor-card">
-
-            <div class="supervisor-card-header">
-
-                <div class="supervisor-icon core-icon">
-
-                    <i class="bi bi-person-workspace"></i>
-
-                </div>
-
-                <div>
-
-                    <h5>
-                        CO/Supervisor
-                    </h5>
-
-                    <p>
-                        Your main research supervisor
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            @if($coreSupervisor && $coreSupervisor->supervisor)
-
-                @php
-
-                    $supervisor =
-                        $coreSupervisor->supervisor;
-
-                    $name = trim(
-                        ($supervisor->firstname ?? '') . ' ' .
-                        ($supervisor->middlename ?? '') . ' ' .
-                        ($supervisor->lastname ?? '')
-                    );
-
-                    $words = preg_split(
-                        '/\s+/',
-                        $name
-                    );
-
-                    $initials = '';
-
-                    foreach(array_slice($words, 0, 2) as $word){
-
-                        if(!empty($word)){
-
-                            $initials .= strtoupper(
-                                substr($word, 0, 1)
-                            );
-
-                        }
-
-                    }
-
-                @endphp
-
-
-                {{-- PROFILE --}}
-
-                <div class="supervisor-profile">
-
-                    <div class="supervisor-avatar">
-                        {{ $initials ?: 'S' }}
-                    </div>
-
-                    <div class="supervisor-name">
-                        {{ $name }}
-                    </div>
-
-                    <span class="supervisor-badge core-badge">
-
-                        <i class="bi bi-check-circle me-1"></i>
-
-                        Core Supervisor
-
-                    </span>
-
-                </div>
-
-
-                {{-- DETAILS --}}
-
-                <div class="supervisor-details">
-
-
-                    <div class="detail-row">
-
-                        <span class="detail-label">
-                            Full Name
-                        </span>
-
-                        <span class="detail-value">
-                            {{ $name }}
-                        </span>
-
-                    </div>
-
-
-                    <div class="detail-row">
-
-                        <span class="detail-label">
-                            Email
-                        </span>
-
-                        <span class="detail-value">
-                            {{ $supervisor->email ?? 'Not provided' }}
-                        </span>
-
-                    </div>
-
-
-                    <div class="detail-row">
-
-                        <span class="detail-label">
-                            Phone
-                        </span>
-
-                        <span class="detail-value">
-                            {{ $supervisor->phone ?? 'Not provided' }}
-                        </span>
-
-                    </div>
-
-
-                    <div class="detail-row">
-
-                        <span class="detail-label">
-                            Role
-                        </span>
-
-                        <span class="detail-value">
-                            {{ $supervisor->role ?? 'Supervisor' }}
-                        </span>
-
-                    </div>
-
-
-                    <div class="detail-row">
-
-                        <span class="detail-label">
-                            Assignment Status
-                        </span>
-
-                        <span class="detail-value">
-
-                            <span class="status-active">
-
-                                <i class="bi bi-circle-fill"
-                                   style="font-size:7px;">
-                                </i>
-
-                                {{ ucfirst($coreSupervisor->status) }}
-
-                            </span>
-
-                        </span>
-
-                    </div>
-
-
-                </div>
-
-
-            @else
-
-                <div class="empty-supervisor">
-
-                    <i class="bi bi-person-x"></i>
-
-                    <h6>
-                        No Core Supervisor Assigned
-                    </h6>
-
-                    <p>
-                        You currently do not have a Core Supervisor.
-                    </p>
-
-                </div>
-
-            @endif
-
-        </div>
-
-
 
         {{-- =================================================
              PRINCIPAL SUPERVISOR
@@ -816,6 +623,195 @@
 
                     <p>
                         You currently do not have a Principal Supervisor.
+                    </p>
+
+                </div>
+
+            @endif
+
+        </div>
+        {{-- =================================================
+             CORE SUPERVISOR
+        ================================================== --}}
+
+        <div class="supervisor-card">
+
+            <div class="supervisor-card-header">
+
+                <div class="supervisor-icon core-icon">
+
+                    <i class="bi bi-person-workspace"></i>
+
+                </div>
+
+                <div>
+
+                    <h5>
+                        Co-Supervisor
+                    </h5>
+
+                    <p>
+                        Your Co-supervisor research supervisor
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            @if($coreSupervisor && $coreSupervisor->supervisor)
+
+                @php
+
+                    $supervisor =
+                        $coreSupervisor->supervisor;
+
+                    $name = trim(
+                        ($supervisor->firstname ?? '') . ' ' .
+                        ($supervisor->middlename ?? '') . ' ' .
+                        ($supervisor->lastname ?? '')
+                    );
+
+                    $words = preg_split(
+                        '/\s+/',
+                        $name
+                    );
+
+                    $initials = '';
+
+                    foreach(array_slice($words, 0, 2) as $word){
+
+                        if(!empty($word)){
+
+                            $initials .= strtoupper(
+                                substr($word, 0, 1)
+                            );
+
+                        }
+
+                    }
+
+                @endphp
+
+
+                {{-- PROFILE --}}
+
+                <div class="supervisor-profile">
+
+                    <div class="supervisor-avatar">
+                        {{ $initials ?: 'S' }}
+                    </div>
+
+                    <div class="supervisor-name">
+                        {{ $name }}
+                    </div>
+
+                    <span class="supervisor-badge core-badge">
+
+                        <i class="bi bi-check-circle me-1"></i>
+
+                        Co-Supervisor
+
+                    </span>
+
+                </div>
+
+
+                {{-- DETAILS --}}
+
+                <div class="supervisor-details">
+
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Full Name
+                        </span>
+
+                        <span class="detail-value">
+                            {{ $name }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Email
+                        </span>
+
+                        <span class="detail-value">
+                            {{ $supervisor->email ?? 'Not provided' }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Phone
+                        </span>
+
+                        <span class="detail-value">
+                            {{ $supervisor->phone ?? 'Not provided' }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Role
+                        </span>
+
+                        <span class="detail-value">
+                            {{ $supervisor->role ?? 'Supervisor' }}
+                        </span>
+
+                    </div>
+
+
+                    <div class="detail-row">
+
+                        <span class="detail-label">
+                            Assignment Status
+                        </span>
+
+                        <span class="detail-value">
+
+                            <span class="status-active">
+
+                                <i class="bi bi-circle-fill"
+                                   style="font-size:7px;">
+                                </i>
+
+                                {{ ucfirst($coreSupervisor->status) }}
+
+                            </span>
+
+                        </span>
+
+                    </div>
+
+
+                </div>
+
+
+            @else
+
+                <div class="empty-supervisor">
+
+                    <i class="bi bi-person-x"></i>
+
+                    <h6>
+                        No Core Supervisor Assigned
+                    </h6>
+
+                    <p>
+                        You currently do not have a Core Supervisor.
                     </p>
 
                 </div>

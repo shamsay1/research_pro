@@ -524,10 +524,8 @@
 
                                 @if($research)
 
-                                    <div class="research-title">
-
-                                        {{ $research->title }}
-
+                                   <div class="research-title" title="{{ $research->title }}">
+                                        {{ Str::limit($research->title, 20, '...') }}
                                     </div>
 
                                 @else

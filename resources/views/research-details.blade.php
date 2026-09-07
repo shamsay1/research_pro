@@ -737,7 +737,7 @@ textarea.form-control{
 
             <p class="text-muted small">
 
-                If the research is correct, approve it.
+                {{-- If the research is correct, approve it. --}}
                 If there are corrections, write your comments
                 and send them to the student.
 
@@ -767,7 +767,7 @@ textarea.form-control{
                     @method('PATCH')
 
 
-                    <button
+                    {{-- <button
                         type="submit"
                         class="approve-btn"
                     >
@@ -776,7 +776,7 @@ textarea.form-control{
 
                         Approve Research
 
-                    </button>
+                    </button> --}}
 
                 </form>
 
