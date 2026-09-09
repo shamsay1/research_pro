@@ -34,16 +34,7 @@ tbody tr:hover{background:#f8fafc}
 @media(max-width:768px){.page-header,.table-top{flex-direction:column;align-items:stretch}.search-box{width:100%}.staff-card{padding:15px}}
 </style>
 
-<div class="page-header">
-    <div>
-        <h4>Manage Staff</h4>
-        <p>Manage staff members in the system</p>
-    </div>
 
-    <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addStaffModal">
-        <i class="bi bi-person-plus-fill me-1"></i> Add Staff
-    </button>
-</div>
 
 <div class="staff-card">
 

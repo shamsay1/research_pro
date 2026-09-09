@@ -429,242 +429,253 @@
                         <th>
                             Submitted
                         </th>
+                        <th>Action</th>
 
                     </tr>
 
                 </thead>
 
 
-                <tbody>
+              <tbody>
 
+    @foreach($assignments as $index => $assignment)
 
-                    @foreach($assignments as $index => $assignment)
+        @php
 
+            $student = $assignment->student;
 
-                        @php
+            $research = $student
+                ->researchProposals
+                ->first();
 
-                            $student =
-                                $assignment->student;
+        @endphp
 
-                            $research =
-                                $student
-                                ->researchProposals
-                                ->first();
+        <tr>
 
-                        @endphp
+            {{-- NUMBER --}}
+            <td>
+                {{ $index + 1 }}
+            </td>
 
 
-                        <tr>
+            {{-- STUDENT --}}
+            <td>
 
+                <div class="student-info">
 
-                            {{-- NUMBER --}}
+                    <div class="student-avatar">
+                        <i class="bi bi-person"></i>
+                    </div>
 
-                            <td>
+                    <div>
 
-                                {{ $index + 1 }}
+                        <div class="student-name">
 
-                            </td>
+                            {{ $student->firstname }}
+                            {{ $student->middlename }}
+                            {{ $student->lastname }}
 
+                        </div>
 
+                        <div class="student-reg">
 
-                            {{-- STUDENT --}}
+                            {{ $student->email ?? '-' }}
 
-                            <td>
+                        </div>
 
-                                <div class="student-info">
+                    </div>
 
+                </div>
 
-                                    <div class="student-avatar">
+            </td>
 
-                                        <i class="bi bi-person"></i>
 
-                                    </div>
+            {{-- REGISTRATION --}}
+            <td>
 
+                {{ $student->reg_number }}
 
-                                    <div>
+            </td>
 
-                                        <div class="student-name">
 
-                                            {{ $student->firstname }}
+            {{-- RESEARCH TITLE --}}
+            <td>
 
-                                            {{ $student->middlename }}
+                @if($research)
 
-                                            {{ $student->lastname }}
+                    <div
+                        class="research-title"
+                        title="{{ $research->title }}"
+                    >
+                        {{ Str::limit($research->title, 20, '...') }}
+                    </div>
 
-                                        </div>
+                @else
 
+                    <span class="no-research">
+                        No research submitted
+                    </span>
 
-                                        <div class="student-reg">
+                @endif
 
-                                            {{ $student->email ?? '-' }}
+            </td>
 
-                                        </div>
 
-                                    </div>
+            {{-- CURRENT RESEARCH --}}
+            <td>
 
-                                </div>
+                @if($research && $research->document)
 
-                            </td>
+                    <a
+                        href="{{ route(
+                            'supervisor.research.show',
+                            $research->id
+                        ) }}"
+                        class="document-btn"
+                    >
 
+                        <i class="bi bi-eye"></i>
 
+                        View current research
 
-                            {{-- REGISTRATION --}}
+                    </a>
 
-                            <td>
+                @else
 
-                                {{ $student->reg_number }}
+                    <span class="no-research">
+                        -
+                    </span>
 
-                            </td>
+                @endif
 
+            </td>
 
 
-                            {{-- RESEARCH TITLE --}}
+            {{-- ALL RESEARCHES --}}
+            <td>
 
-                            <td>
+                @if($research && $research->document)
 
-                                @if($research)
+                    <a
+                        href="{{ route(
+                            'student.research.responses1',
+                            $student->id
+                        ) }}"
+                        class="document-btn"
+                    >
 
-                                   <div class="research-title" title="{{ $research->title }}">
-                                        {{ Str::limit($research->title, 20, '...') }}
-                                    </div>
+                        <i class="bi bi-eye"></i>
 
-                                @else
+                        All researches
 
-                                    <span class="no-research">
+                    </a>
 
-                                        No research submitted
+                @else
 
-                                    </span>
+                    <span class="no-research">
+                        -
+                    </span>
 
-                                @endif
+                @endif
 
-                            </td>
+            </td>
 
 
+            {{-- STATUS --}}
+            <td>
 
-                            {{-- DOCUMENT --}}
+                @if($research)
 
-                            <td>
+                    <span
+                        class="status-badge status-{{ $research->status }}"
+                    >
 
-                               @if($research && $research->document)
+                        {{ ucfirst(
+                            str_replace(
+                                '_',
+                                ' ',
+                                $research->status
+                            )
+                        ) }}
 
-    <a
-        href="{{ route(
-            'supervisor.research.show',
-            $research->id
-        ) }}"
-        class="document-btn"
-    >
+                    </span>
 
-        <i class="bi bi-eye"></i>
+                @else
 
-        View
+                    <span class="status-badge">
+                        -
+                    </span>
 
-    </a>
+                @endif
 
-@else
+            </td>
 
-    <span class="no-research">
 
-        -
+            {{-- DATE --}}
+            <td>
 
-    </span>
+                @if($research)
 
-@endif
+                    {{ $research->created_at->format('d M Y') }}
 
-                            </td>
-                            <td>
+                @else
 
-                               @if($research && $research->document)
+                    -
+                    
+                @endif
 
-    <a
-        href="{{ route(
-            'student.research.responses1',
-            $student->id
-        ) }}"
-        class="document-btn"
-    >
+            </td>
 
-        <i class="bi bi-eye"></i>
 
-        all researches
+            {{-- DELETE --}}
+            <td>
 
-    </a>
+                @if($research)
 
-@else
+                    <form
+                        action="{{ route(
+                            'admin.research.destroy',
+                            $research->id
+                        ) }}"
+                        method="POST"
+                        onsubmit="return confirm(
+                            'Are you sure you want to delete this research? This action cannot be undone.'
+                        );"
+                        style="display:inline;"
+                    >
 
-    <span class="no-research">
+                        @csrf
 
-        -
+                        @method('DELETE')
 
-    </span>
+                        <button
+                            type="submit"
+                            class="btn btn-danger btn-sm"
+                            title="Delete Research"
+                        >
 
-@endif
+                            <i class="bi bi-trash"></i>
 
-                            </td>
 
+                        </button>
 
+                    </form>
 
-                            {{-- STATUS --}}
+                @else
 
-                            <td>
+                    <span class="text-muted">
+                        -
+                    </span>
 
-                                @if($research)
+                @endif
 
-                                    <span
-                                        class="status-badge status-{{ $research->status }}"
-                                    >
+            </td>
 
-                                        {{ ucfirst(
-                                            str_replace(
-                                                '_',
-                                                ' ',
-                                                $research->status
-                                            )
-                                        ) }}
+        </tr>
 
-                                    </span>
+    @endforeach
 
-                                @else
-
-                                    <span class="status-badge">
-
-                                        -
-
-                                    </span>
-
-                                @endif
-
-                            </td>
-
-
-
-                            {{-- DATE --}}
-
-                            <td>
-
-                                @if($research)
-
-                                    {{ $research->created_at->format(
-                                        'd M Y'
-                                    ) }}
-
-                                @else
-
-                                    -
-
-                                @endif
-
-                            </td>
-
-
-                        </tr>
-
-
-                    @endforeach
-
-
-                </tbody>
+</tbody>
 
             </table>
 

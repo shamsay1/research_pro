@@ -692,7 +692,7 @@
          ADMIN
     ====================================================== --}}
 
-    <a href="{{ route('staff.index') }}">
+    <a href="{{ route('staff.index') }}" class="{{ Route::currentRouteName() == 'staff.index' ? 'active' : '' }}">
 
         <i class="bi bi-person-badge-fill"></i>
 
@@ -701,7 +701,7 @@
     </a>
 
 
-    <a href="{{ route('student.index') }}">
+    <a href="{{ route('student.index') }}" class="{{ Route::currentRouteName() == 'student.index' ? 'active' : '' }}">
 
         <i class="bi bi-mortarboard-fill"></i>
 
@@ -710,14 +710,14 @@
     </a>
 
 
-    <a href="{{ route('supervisor.assignments.index') }}">
+    <a href="{{ route('supervisor.assignments.index') }}" class="{{ Route::currentRouteName() == 'supervisor.assignments.index' ? 'active' : '' }}">
 
         <i class="bi bi-person-check-fill"></i>
 
         <span>Assign Students</span>
 
     </a>
- <a href="{{ route('admin.chats') }}" class="chat-menu">
+ <a href="{{ route('admin.chats') }}" class="chat-menu {{Route::currentRouteName() == 'admin.chats' ? 'active' : ''}}">
 
     <div class="chat-icon">
 
@@ -741,7 +741,7 @@
    
 
 
-    <a href="{{ route('admin.research.report') }}">
+    <a href="{{ route('admin.research.report') }}" class="{{ Route::currentRouteName() == 'admin.research.report' ? 'active' : '' }}">
 
        <i class="bi bi-bar-chart"></i>
 
@@ -775,6 +775,13 @@
         <span>Researches</span>
 
     </a>
+    {{-- <a href="{{ route('student.chat') }}" class="{{ Route::currentRouteName() == 'student.chat' ? 'active' : '' }}">
+
+        <i class="bi bi-chat-left-text-fill"></i>
+
+        <span>Chats</span>
+
+    </a> --}}
 
 
 @elseif(

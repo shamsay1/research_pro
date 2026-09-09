@@ -491,30 +491,7 @@ body{
 
     @csrf
 
-    <!-- Email -->
-    <div class="mb-4">
-
-        <label for="email" class="form-label">
-            Email Address
-        </label>
-
-        <div class="input-group custom-input">
-
-            <span class="input-group-text">
-                <i class="bi bi-envelope"></i>
-            </span>
-
-            <input
-                type="email"
-                class="form-control"
-                name="email"
-                placeholder="Enter your email"
-                required
-            >
-
-        </div>
-
-    </div>
+   
 
 
     <!-- Password -->
@@ -523,11 +500,11 @@ body{
         <div class="password-label">
 
             <label for="password" class="form-label">
-                Password
+                Email
             </label>
 
-            <a href="{{ route('forgot') }}" class="forgot-password">
-                Forgot Password?
+            <a href="{{ route('login1') }}" class="forgot-password">
+                Back to login
             </a>
 
         </div>
@@ -542,7 +519,7 @@ body{
                 type="password"
                 class="form-control"
                 name="password"
-                placeholder="Enter your password"
+                placeholder="Enter your email"
                 required
             >
 
@@ -578,7 +555,7 @@ body{
     >
 
         <span id="loginText">
-            Login
+            Forgot Password
         </span>
 
         <span

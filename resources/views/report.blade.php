@@ -956,7 +956,7 @@ function timeDifference($from, $to)
 
     <span class="badge bg-primary">
         {{ $studentResearches->count() }}
-        {{ $studentResearches->count() == 1 ? 'Research' : 'Researches' }}
+        {{ $studentResearches->count() == 1 ? 'Times Research submission' : 'Times Researches submission' }}
     </span>
 
     <a
@@ -1125,7 +1125,7 @@ function timeDifference($from, $to)
 
 <div class="label">
 
-    Supervisor
+    <span>{{ $supervisor->supervisor_type }}</span>
 
 </div>
 
@@ -1137,6 +1137,7 @@ function timeDifference($from, $to)
     {{ $supervisor->middlename }}
 
     {{ $supervisor->lastname }}
+    
 
 </div>
 
@@ -1349,6 +1350,8 @@ function timeDifference($from, $to)
     Student :
 
     {{ $student->firstname }}
+
+    {{ $student->middlename }}
 
     {{ $student->lastname }}
 

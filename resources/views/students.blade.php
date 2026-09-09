@@ -40,10 +40,118 @@ tbody tr:hover{background:#f8fafc}
         <p>Manage Student members in the system</p>
     </div>
 
-    <button class="btn-add" data-bs-toggle="modal" data-bs-target="#addStaffModal">
-        <i class="bi bi-person-plus-fill me-1"></i> Add Student
-    </button>
+    <div class="d-flex gap-2">
+
+        <!-- Download Template -->
+        <a href="{{ route('students.template') }}" class="btn btn-outline-success">
+            <i class="bi bi-download me-1"></i>
+            Download Template
+        </a>
+
+        <!-- Import Staff -->
+        <button
+            type="button"
+            class="btn btn-outline-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#importStaffModal"
+        >
+            <i class="bi bi-upload me-1"></i>
+            Import Student
+        </button>
+
+        <!-- Add Staff -->
+        <button
+            class="btn-add"
+            data-bs-toggle="modal"
+            data-bs-target="#addStaffModal"
+        >
+            <i class="bi bi-person-plus-fill me-1"></i>
+            Add Student
+        </button>
+
+    </div>
 </div>
+<!-- Import Staff Modal -->
+<div class="modal fade" id="importStaffModal" tabindex="-1" aria-labelledby="importStaffModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title" id="importStaffModalLabel">
+                    <i class="bi bi-upload me-2"></i>
+                    Import Staff
+                </h5>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close">
+                </button>
+            </div>       
+            <form action="{{ route('students.import') }}" method="POST" enctype="multipart/form-data">
+
+                @csrf
+
+                <div class="modal-body">
+
+                    <div class="text-center mb-3">
+                        <i class="bi bi-file-earmark-excel-fill"
+                           style="font-size: 45px; color: #198754;"></i>
+
+                        <h6 class="mt-2">Upload Staff File</h6>
+
+                        <p class="text-muted small mb-0">
+                            Choose an Excel or CSV file containing staff members.
+                        </p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="staff_file" class="form-label">
+                            Select File
+                        </label>
+
+                        <input
+                            type="file"
+                            name="student_file"
+                            id="staff_file"
+                            class="form-control"
+                            accept=".xlsx,.xls,.csv"
+                            required
+                        >
+
+                        <div class="form-text">
+                            Allowed formats: XLSX, XLS, CSV
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary">
+                        <i class="bi bi-upload me-1"></i>
+                        Import Staff
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
 
 <div class="staff-card">
 
@@ -114,13 +222,188 @@ tbody tr:hover{background:#f8fafc}
 
                     <td class="text-center">
 
-                        <a href="{{ route('staff.edit', $user->id) }}"
-                           class="action-btn action-edit"
-                           title="Edit">
-                            <i class="bi bi-pencil"></i>
-                        </a>
+                        <button type="button"
+                            class="action-btn action-edit"
+                            title="Edit"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editStudentModal{{ $user->id }}">
 
-                        @if($user->status === 'active')
+                        <i class="bi bi-pencil"></i>
+
+                    </button>
+                    <div class="modal fade"
+     id="editStudentModal{{ $user->id }}"
+     tabindex="-1"
+     aria-labelledby="editStudentModalLabel{{ $user->id }}"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content">
+
+            {{-- HEADER --}}
+            <div class="modal-header">
+
+                <h5 class="modal-title"
+                    id="editStudentModalLabel{{ $user->id }}">
+
+                    <i class="bi bi-pencil-square me-2"></i>
+                    Edit Student Information
+
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close">
+                </button>
+
+            </div>
+
+
+            {{-- FORM --}}
+            <form action="{{ route('student.update', $user->id) }}"
+                  method="POST">
+
+                @csrf
+
+                @method('PUT')
+
+
+                <div class="modal-body">
+
+                    <div class="row g-3">
+
+                        {{-- FIRSTNAME --}}
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                First Name
+                            </label>
+
+                            <input type="text"
+                                   name="firstname"
+                                   class="form-control"
+                                   value="{{ old('firstname', $user->firstname) }}"
+                                   required>
+
+                        </div>
+
+
+                        {{-- MIDDLENAME --}}
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Middle Name
+                            </label>
+
+                            <input type="text"
+                                   name="middlename"
+                                   class="form-control"
+                                   value="{{ old('middlename', $user->middlename) }}">
+
+                        </div>
+
+
+                        {{-- LASTNAME --}}
+                        <div class="col-md-4">
+
+                            <label class="form-label">
+                                Last Name
+                            </label>
+
+                            <input type="text"
+                                   name="lastname"
+                                   class="form-control"
+                                   value="{{ old('lastname', $user->lastname) }}"
+                                   required>
+
+                        </div>
+
+
+                        {{-- EMAIL --}}
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Email
+                            </label>
+
+                            <input type="email"
+                                   name="email"
+                                   class="form-control"
+                                   value="{{ old('email', $user->email) }}"
+                                   required>
+
+                        </div>
+
+
+                        {{-- PHONE --}}
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Phone
+                            </label>
+
+                            <input type="text"
+                                   name="phone"
+                                   class="form-control"
+                                   value="{{ old('phone', $user->phone) }}">
+
+                        </div>
+
+
+                        {{-- REG NUMBER --}}
+                        <div class="col-md-6">
+
+                            <label class="form-label">
+                                Registration Number
+                            </label>
+
+                            <input type="text"
+                                   name="reg_number"
+                                   class="form-control"
+                                   value="{{ old('reg_number', $user->reg_number) }}"
+                                   required>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {{-- FOOTER --}}
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+
+                        <i class="bi bi-x-circle me-1"></i>
+                        Cancel
+
+                    </button>
+
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <i class="bi bi-check-circle me-1"></i>
+                        Update Student
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+                        {{-- @if($user->status === 'active')
 
                             <form action="{{ route('student.block', $user->id) }}"
                                   method="POST"
@@ -148,7 +431,7 @@ tbody tr:hover{background:#f8fafc}
                                 </button>
                             </form>
 
-                        @endif
+                        @endif --}}
 
                         <form action="{{ route('staff.destroy', $user->id) }}"
                               method="POST"
@@ -177,6 +460,9 @@ tbody tr:hover{background:#f8fafc}
 
             </tbody>
         </table>
+        <div>
+            {{ $staff->links() }}
+        </div>
     </div>
 </div>
 
@@ -287,17 +573,74 @@ tbody tr:hover{background:#f8fafc}
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{{-- SUCCESS MESSAGE --}}
 @if(session('success'))
 <script>
-Swal.fire({
-    icon: 'success',
-    title: 'Success!',
-    text: '{{ session('success') }}',
-    confirmButtonText: 'OK'
-});
+    Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: @json(session('success')),
+        confirmButtonText: 'OK'
+    });
 </script>
 @endif
 
+
+{{-- ERROR MESSAGE --}}
+@if(session('error'))
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: @json(session('error')),
+        confirmButtonText: 'OK'
+    });
+</script>
+@endif
+
+
+{{-- IMPORT VALIDATION ERRORS --}}
+@if(session('import_errors'))
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Import Errors',
+        html: `
+            <div style="text-align: left;">
+                <ul style="padding-left: 20px; margin-bottom: 0;">
+                    @foreach(session('import_errors') as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        `,
+        confirmButtonText: 'OK',
+        width: '600px'
+    });
+</script>
+@endif
+
+
+{{-- NORMAL FORM VALIDATION ERRORS --}}
+@if($errors->any())
+<script>
+    Swal.fire({
+        icon: 'error',
+        title: 'Please correct the following errors',
+        html: `
+            <div style="text-align: left;">
+                <ul style="padding-left: 20px; margin-bottom: 0;">
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        `,
+        confirmButtonText: 'OK',
+        width: '600px'
+    });
+</script>
+@endif
 <script>
 document.getElementById('staffSearch').addEventListener('keyup', function () {
     const search = this.value.toLowerCase();

@@ -1379,5 +1379,16 @@ public function responses1($id)
 
     return $pdf->stream($fileName);
 }
-    
+    public function destroy($id)
+{
+    $research = ResearchProposal::findOrFail($id);
+
+    // Futa research kwenye database
+    $research->delete();
+
+    return back()->with(
+        'success',
+        'Research deleted successfully.'
+    );
+}
 }

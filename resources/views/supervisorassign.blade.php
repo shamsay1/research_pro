@@ -440,7 +440,7 @@
     </h4>
 
     <p>
-        Manage CO and Principal Supervisors assigned to students
+        Manage Co-Supervisor and Principal Supervisors assigned to students
     </p>
 
 </div>
@@ -654,7 +654,7 @@
 
                                         <i class="bi bi-check-circle me-1"></i>
 
-                                        Complete
+                                       Click to view info
 
                                     </span>
 
@@ -860,143 +860,6 @@
 
                         <div class="supervisor-grid">
 
-
-                            {{-- ================================================= --}}
-                            {{-- CORE SUPERVISOR --}}
-                            {{-- ================================================= --}}
-
-                            <div class="supervisor-card core">
-
-
-                                <div class="supervisor-top">
-
-
-                                    <div class="supervisor-person">
-
-
-                                        <div class="supervisor-avatar">
-
-                                            <i class="bi bi-person-workspace"></i>
-
-                                        </div>
-
-
-                                        <div>
-
-                                            @if($coreSupervisor)
-
-                                                <div class="supervisor-name">
-
-                                                    {{ $coreSupervisor->supervisor->firstname }}
-                                                    {{ $coreSupervisor->supervisor->middlename }}
-                                                    {{ $coreSupervisor->supervisor->lastname }}
-
-                                                </div>
-
-                                                <div class="supervisor-role">
-
-                                                    CO/Supervisor
-
-                                                </div>
-
-                                            @else
-
-                                                <div class="supervisor-name text-muted">
-
-                                                    Not Assigned
-
-                                                </div>
-
-                                                <div class="supervisor-role">
-
-                                                    Core Supervisor
-
-                                                </div>
-
-                                            @endif
-
-                                        </div>
-
-                                    </div>
-
-
-                                    <span class="core-badge">
-
-                                        CORE
-
-                                    </span>
-
-
-                                </div>
-
-
-                                @if($coreSupervisor)
-
-                                    <div class="supervisor-details">
-
-
-                                        <div class="supervisor-detail">
-
-                                            <i class="bi bi-envelope"></i>
-
-                                            <span>
-
-                                                {{ $coreSupervisor->supervisor->email }}
-
-                                            </span>
-
-                                        </div>
-
-
-                                        <div class="supervisor-detail">
-
-                                            <i class="bi bi-telephone"></i>
-
-                                            <span>
-
-                                                {{ $coreSupervisor->supervisor->phone }}
-
-                                            </span>
-
-                                        </div>
-
-
-                                        <div class="supervisor-detail">
-
-                                            <i class="bi bi-person-badge"></i>
-
-                                            <span>
-
-                                                {{ ucfirst($coreSupervisor->supervisor->role) }}
-
-                                            </span>
-
-                                        </div>
-
-
-                                        <div class="supervisor-detail">
-
-                                            <i class="bi bi-check-circle"></i>
-
-                                            <span>
-
-                                                Status:
-                                                {{ ucfirst($coreSupervisor->status) }}
-
-                                            </span>
-
-                                        </div>
-
-
-                                    </div>
-
-                                @endif
-
-
-                            </div>
-
-
-
                             {{-- ================================================= --}}
                             {{-- PRINCIPAL SUPERVISOR --}}
                             {{-- ================================================= --}}
@@ -1056,11 +919,26 @@
                                     </div>
 
 
-                                    <span class="principal-badge">
+                                   <div class="supervisor-actions">
 
-                                        PRINCIPAL
+                            <span class="principal-badge">
+                                PRINCIPAL
+                            </span>
 
-                                    </span>
+                            <button
+                                type="button"
+                                class="btn btn-sm btn-outline-primary edit-supervisor-btn"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editSupervisorModal"
+                                data-type="principal"
+                                data-assignment="{{ $principalSupervisor?->id }}"
+                                data-current="{{ $principalSupervisor?->teacher_id }}"
+                            >
+                                <i class="bi bi-pencil-square"></i>
+                                Edit
+                            </button>
+
+                        </div>
 
 
                                 </div>
@@ -1122,6 +1000,10 @@
                                             </span>
 
                                         </div>
+                                         <div class="supervisor-detail">
+                                             Created date: {{ $principalSupervisor->updated_at->format('m-d-Y') }}
+                                            
+                                         </div>
 
 
                                     </div>
@@ -1130,6 +1012,306 @@
 
 
                             </div>
+                            {{-- ================================================= --}}
+                            {{-- CORE SUPERVISOR --}}
+                            {{-- ================================================= --}}
+
+                            <div class="supervisor-card core">
+
+
+                                <div class="supervisor-top">
+
+
+                                    <div class="supervisor-person">
+
+
+                                        <div class="supervisor-avatar">
+
+                                            <i class="bi bi-person-workspace"></i>
+
+                                        </div>
+
+
+                                        <div>
+
+                                            @if($coreSupervisor)
+
+                                                <div class="supervisor-name">
+
+                                                    {{ $coreSupervisor->supervisor->firstname }}
+                                                    {{ $coreSupervisor->supervisor->middlename }}
+                                                    {{ $coreSupervisor->supervisor->lastname }}
+
+                                                </div>
+
+                                                <div class="supervisor-role">
+
+                                                    Co-Supervisor
+
+                                                </div>
+
+                                            @else
+
+                                                <div class="supervisor-name text-muted">
+
+                                                    Not Assigned
+
+                                                </div>
+
+                                                <div class="supervisor-role">
+
+                                                    Co-Supervisor
+
+                                                </div>
+                                              
+
+                                            @endif
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="supervisor-actions">
+
+    <span class="core-badge">
+        Co-Supervisor
+    </span>
+
+    <button
+        type="button"
+        class="btn btn-sm btn-outline-primary edit-supervisor-btn"
+        data-bs-toggle="modal"
+        data-bs-target="#editSupervisorModal"
+        data-type="core"
+        data-assignment="{{ $coreSupervisor?->id }}"
+        data-current="{{ $coreSupervisor?->teacher_id }}"
+    >
+        <i class="bi bi-pencil-square"></i>
+        Edit
+    </button>
+
+</div>
+
+
+                                </div>
+
+
+                                @if($coreSupervisor)
+
+                                    <div class="supervisor-details">
+
+
+                                        <div class="supervisor-detail">
+
+                                            <i class="bi bi-envelope"></i>
+
+                                            <span>
+
+                                                {{ $coreSupervisor->supervisor->email }}
+
+                                            </span>
+
+                                        </div>
+
+
+                                        <div class="supervisor-detail">
+
+                                            <i class="bi bi-telephone"></i>
+
+                                            <span>
+
+                                                {{ $coreSupervisor->supervisor->phone }}
+
+                                            </span>
+
+                                        </div>
+
+
+                                        <div class="supervisor-detail">
+
+                                            <i class="bi bi-person-badge"></i>
+
+                                            <span>
+
+                                                {{ ucfirst($coreSupervisor->supervisor->role) }}
+
+                                            </span>
+
+                                        </div>
+
+                                        <!-- ========================================================= -->
+<!-- EDIT SUPERVISOR MODAL -->
+<!-- ========================================================= -->
+
+<div
+    class="modal fade"
+    id="editSupervisorModal"
+    tabindex="-1"
+    aria-labelledby="editSupervisorModalLabel"
+    aria-hidden="true"
+>
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <form
+                method="POST"
+                id="editSupervisorForm"
+                action="{{ route('admin.supervisor.update', $student->id) }}"
+            >
+
+                @csrf
+                @method('PUT')
+
+                <!-- HEADER -->
+                <div class="modal-header">
+
+                    <div>
+                        <h5 class="modal-title" id="editSupervisorModalLabel">
+                            Edit Supervisor
+                        </h5>
+
+                        <small class="text-muted">
+                            Change the assigned supervisor
+                        </small>
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                    ></button>
+
+                </div>
+
+
+                <!-- BODY -->
+                <div class="modal-body">
+
+                    <!-- Supervisor Type -->
+                    <div class="mb-3">
+
+                        <label class="form-label">
+                            Supervisor Type
+                        </label>
+
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="supervisorTypeDisplay"
+                            readonly
+                        >
+
+                        <input
+                            type="hidden"
+                            name="supervisor_type"
+                            id="supervisorType"
+                        >
+
+                    </div>
+
+
+                    <!-- Supervisor -->
+                    <div class="mb-3">
+
+                        <label
+                            for="supervisor_id"
+                            class="form-label"
+                        >
+                            Select Supervisor
+                        </label>
+
+                        <select
+                            name="supervisor_id"
+                            id="supervisor_id"
+                            class="form-select"
+                            required
+                        >
+
+                            <option value="">
+                                -- Select Supervisor --
+                            </option>
+
+                            @foreach($teachers as $supervisor)
+
+                                <option
+                                    value="{{ $supervisor->id }}"
+                                >
+                                    {{ $supervisor->firstname }}
+                                    {{ $supervisor->middlename }}
+                                    {{ $supervisor->lastname }}
+                                    — {{ $supervisor->email }}
+                                </option>
+
+                            @endforeach
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FOOTER -->
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                    >
+                        <i class="bi bi-check-circle me-1"></i>
+                        Update Supervisor
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+
+                                        <div class="supervisor-detail">
+
+                                            <i class="bi bi-check-circle"></i>
+
+                                            <span>
+
+                                                Status:
+                                                {{ ucfirst($coreSupervisor->status) }}
+
+                                            </span>
+                                              
+
+                                        </div>
+                                         <div class="supervisor-detail">
+                                             Created date: {{ $coreSupervisor->updated_at->format('m-d-Y') }}
+                                            
+                                         </div>
+
+
+                                    </div>
+
+                                @endif
+
+
+                            </div>
+
+
+
+                            
 
 
                         </div>
@@ -1275,7 +1457,7 @@
                     <i class="bi bi-info-circle me-1"></i>
 
                     Each student must have exactly two supervisors:
-                    <strong>one CO/Supervisor</strong>
+                    <strong>one Co-Supervisor</strong>
                     and
                     <strong>one Principal Supervisor</strong>.
 
@@ -1385,7 +1567,7 @@
 
                     <small class="text-muted">
 
-                        CO/supervisor and Principal Supervisors must be different.
+                        Co-Supervisor and Principal Supervisors must be different.
 
                     </small>
 
@@ -1400,7 +1582,7 @@
 
                     <label class="form-label">
 
-                        CO/Supervisor
+                        Co-Supervisor
 
                     </label>
 
@@ -1413,7 +1595,7 @@
 
                         <option value="">
 
-                            Select CO/Supervisor
+                            Select Co-Supervisor
 
                         </option>
 
@@ -1483,6 +1665,74 @@
 
 </div>
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const editButtons = document.querySelectorAll('.edit-supervisor-btn');
+
+    const supervisorType = document.getElementById('supervisorType');
+
+    const supervisorTypeDisplay =
+        document.getElementById('supervisorTypeDisplay');
+
+    const supervisorSelect =
+        document.getElementById('supervisor_id');
+
+
+    editButtons.forEach(button => {
+
+        button.addEventListener('click', function () {
+
+            const type = this.dataset.type;
+            const currentSupervisor = this.dataset.current;
+
+            // Set hidden supervisor type
+            supervisorType.value = type;
+
+            // Display supervisor type
+            if (type === 'principal') {
+
+                supervisorTypeDisplay.value =
+                    'Principal Supervisor';
+
+            } else {
+
+                supervisorTypeDisplay.value =
+                    'Co-Supervisor';
+
+            }
+
+
+            // Select current supervisor
+            supervisorSelect.value =
+                currentSupervisor || '';
+
+        });
+
+    });
+
+});
+</script>
+<style>
+
+.supervisor-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.supervisor-actions .btn {
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 10px;
+}
+
+.supervisor-actions .btn i {
+    margin-right: 3px;
+}
+
+</style>
 {{-- ========================================================= --}}
 {{-- SWEET ALERT --}}
 {{-- ========================================================= --}}

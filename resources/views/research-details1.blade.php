@@ -3,7 +3,66 @@
 @section('content')
 
 <style>
+    .supervisor-item {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 12px;
+    background: #f8fafc;
+}
 
+.supervisor-item:last-child {
+    margin-bottom: 0;
+}
+
+.supervisor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.supervisor-badge {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    background: #e2e8f0;
+    color: #334155;
+}
+
+.supervisor-badge.principal {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.supervisor-badge.core {
+    background: #ede9fe;
+    color: #7c3aed;
+}
+
+.active-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 15px;
+    font-size: 10px;
+    font-weight: 700;
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.inactive-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 15px;
+    font-size: 10px;
+    font-weight: 700;
+    background: #fee2e2;
+    color: #dc2626;
+}
     .page-header {
         display:flex;
         align-items:center;
@@ -549,68 +608,164 @@
 
     <!-- SUPERVISOR -->
 
-    <div class="col-lg-6">
+    <!-- SUPERVISORS -->
+<div class="col-lg-6">
 
-        <div class="info-card">
+    <div class="info-card">
 
-            <div class="info-title">
-
-                <i class="bi bi-person-workspace me-1"></i>
-
-                Supervisor Information
-
-            </div>
-
-
-            <div class="info-row">
-
-                <span class="info-label">
-                    Full Name
-                </span>
-
-                <span class="info-value">
-
-                    {{ $assignment->supervisor->firstname }}
-
-                    {{ $assignment->supervisor->middlename }}
-
-                    {{ $assignment->supervisor->lastname }}
-
-                </span>
-
-            </div>
-
-
-            <div class="info-row">
-
-                <span class="info-label">
-                    Role
-                </span>
-
-                <span class="info-value">
-                    Supervisor
-                </span>
-
-            </div>
-
-
-            <div class="info-row">
-
-                <span class="info-label">
-                    Assignment Status
-                </span>
-
-                <span class="info-value">
-
-                    {{ ucfirst($assignment->status) }}
-
-                </span>
-
-            </div>
-
+        <div class="info-title">
+            <i class="bi bi-people-fill me-1"></i>
+            Supervisor Information
         </div>
 
+        @forelse($assignments as $supervisorAssignment)
+
+            <div class="supervisor-item">
+
+                {{-- Supervisor Type --}}
+                <div class="supervisor-header">
+
+                     @if($supervisorAssignment->supervisor_type === 'principal')
+
+                        <span class="supervisor-badge principal">
+                            PRINCIPAL SUPERVISOR
+                        </span>
+
+                    @elseif($supervisorAssignment->supervisor_type === 'core')
+
+                        <span class="supervisor-badge core">
+                            Co-SUPERVISOR
+                        </span>
+                   
+                    @else
+
+                        <span class="supervisor-badge">
+                            {{ ucfirst($supervisorAssignment->supervisor_type) }}
+                        </span>
+
+                    @endif
+
+                    {{-- Assignment Status --}}
+                    @if($supervisorAssignment->status === 'active')
+
+                        <span class="active-badge">
+                            Active
+                        </span>
+
+                    @else
+
+                        <span class="inactive-badge">
+                            {{ ucfirst($supervisorAssignment->status) }}
+                        </span>
+
+                    @endif
+
+                </div>
+
+
+                {{-- Supervisor Name --}}
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Full Name
+                    </span>
+
+                    <span class="info-value">
+
+                        @if($supervisorAssignment->supervisor)
+
+                            {{ $supervisorAssignment->supervisor->firstname }}
+                            {{ $supervisorAssignment->supervisor->middlename }}
+                            {{ $supervisorAssignment->supervisor->lastname }}
+
+                        @else
+
+                            <span class="text-muted">
+                                Supervisor not found
+                            </span>
+
+                        @endif
+
+                    </span>
+
+                </div>
+
+
+                {{-- Email --}}
+                @if($supervisorAssignment->supervisor)
+
+                    <div class="info-row">
+
+                        <span class="info-label">
+                            Email
+                        </span>
+
+                        <span class="info-value">
+                            {{ $supervisorAssignment->supervisor->email ?? '-' }}
+                        </span>
+
+                    </div>
+
+                @endif
+
+
+                {{-- Phone --}}
+                @if($supervisorAssignment->supervisor)
+
+                    <div class="info-row">
+
+                        <span class="info-label">
+                            Phone
+                        </span>
+
+                        <span class="info-value">
+                            {{ $supervisorAssignment->supervisor->phone ?? '-' }}
+                        </span>
+
+                    </div>
+
+                @endif
+
+
+                {{-- Assigned Date --}}
+                <div class="info-row">
+
+                    <span class="info-label">
+                        Assigned On
+                    </span>
+
+                    <span class="info-value">
+
+                        {{ $supervisorAssignment->created_at
+                            ? \Carbon\Carbon::parse(
+                                $supervisorAssignment->created_at
+                            )->format('d M Y')
+                            : '-'
+                        }}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        @empty
+
+            <div class="text-center text-muted py-4">
+
+                <i class="bi bi-person-x fs-3"></i>
+
+                <div class="mt-2">
+                    No supervisor assigned to this student.
+                </div>
+
+            </div>
+
+        @endforelse
+
     </div>
+
+</div>
 
 </div>
 
@@ -842,6 +997,8 @@
 
         @endif
 
+      
+
     </span>
 
 </div>
@@ -1040,13 +1197,13 @@
 
                 <div class="timeline-title">
 
-                    Supervisor Response
+                    Supervisor Response   
 
                 </div>
 
 
                 <div class="timeline-date">
-
+ 
                     <i class="bi bi-calendar3 me-1"></i>
 
                     {{ \Carbon\Carbon::parse(
@@ -1054,7 +1211,13 @@
                     )->format(
                         'd M Y, h:i A'
                     ) }}
-
+                    <br>
+                    from Mr/Mrs
+                    <span class="timeline-title">
+{{ $correction->supervisor->firstname ?? '' }}
+{{ $correction->supervisor->middlename ?? '' }}
+{{ $correction->supervisor->lastname ?? '' }}
+</span>
                 </div>
 
 

@@ -59,7 +59,8 @@ Route::resource(
     '/staff',
     UserController::class
 );
-
+Route::put('/student/{user}', [StudentController::class, 'update'])
+    ->name('student.update');
 Route::patch(
     '/staff/{user}/block',
     [UserController::class, 'block']
@@ -79,7 +80,10 @@ Route::get(
     '/student/research',
     [ResearchProposalController::class, 'index']
 )->name('student.research');
-
+Route::get('/students/template', [UserController::class, 'downloadTemplate'])
+    ->name('students.template');
+Route::post('/students/import', [UserController::class, 'import'])
+    ->name('students.import');
 Route::post(
     '/student/research',
     [ResearchProposalController::class, 'store']
@@ -196,5 +200,14 @@ Route::get(
         '/supervisorsall',
         [MysupervisorController::class, 'mysupervisor']
     )->name('supervisors1');
+Route::put(
+    '/admin/students/{student}/supervisor',
+    [UserController::class, 'updateSupervisor']
+)->name('admin.supervisor.update');
+Route::delete(
+    '/admin/research/{research}',
+    [ResearchProposalController::class, 'destroy']
+)->name('admin.research.destroy');
+Route::get('/forgotpassword',[UserController::class,'forgot'])->name('forgot');
 // =============================== // STUDENT // =============================== 
 // Route::resource( '/student', StudentController::class );

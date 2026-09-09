@@ -12,7 +12,7 @@ class StudentController extends Controller
 {
      public function index()
     {
-        $staff = Student::latest()->get();
+        $staff = Student::paginate(10);
 
         return view('students', compact('staff'));
     }
@@ -38,11 +38,54 @@ class StudentController extends Controller
             ->with('success', 'Student registered successfully.');
     }
 
-    public function edit(Student $user)
-    {
-        return view('staff.edit', compact('user'));
-    }
+    public function update(Request $request, Student $user)
+{
+    $validated = $request->validate([
+        'firstname' => [
+            'required',
+            'string',
+            'max:255',
+        ],
 
+        'middlename' => [
+            'nullable',
+            'string',
+            'max:255',
+        ],
+
+        'lastname' => [
+            'required',
+            'string',
+            'max:255',
+        ],
+
+        'email' => [
+            'required',
+            'email',
+            'max:255',
+            'unique:students,email,' . $user->id,
+        ],
+
+        'phone' => [
+            'nullable',
+            'string',
+            'max:30',
+        ],
+
+        'reg_number' => [
+            'required',
+            'string',
+            'max:100',
+            'unique:students,reg_number,' . $user->id,
+        ],
+    ]);
+
+    $user->update($validated);
+
+    return redirect()
+        ->back()
+        ->with('success', 'Student information updated successfully.');
+}
     
 
     public function block(Student $user)

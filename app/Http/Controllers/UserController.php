@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\StudentExport;
+use App\Imports\StudentImport;
 use App\Models\Notification;
+use App\Models\ResearchCorrection;
 use App\Models\ResearchProposal;
 use App\Models\Student;
 use App\Models\SupervisorAssignment;
@@ -12,7 +15,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Validators\ValidationException;
 class UserController extends Controller
 {
     public function index()
@@ -162,100 +167,99 @@ class UserController extends Controller
     return back();
 }
 
-    public function researchDetails($studentId)
-    {
-        /*
-        |--------------------------------------------------------------------------
-        | GET STUDENT
-        |--------------------------------------------------------------------------
-        */
+  public function researchDetails($studentId)
+{
+    /*
+    |--------------------------------------------------------------------------
+    | GET STUDENT
+    |--------------------------------------------------------------------------
+    */
 
-        $student = Student::findOrFail($studentId);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | GET SUPERVISOR ASSIGNMENT
-        |--------------------------------------------------------------------------
-        */
-
-        $assignment = SupervisorAssignment::with([
-            'student',
-            'supervisor'
-        ])
-        ->where(
-            'student_id',
-            $studentId
-        )
-        ->where(
-            'status',
-            'active'
-        )
-        ->first();
+    $student = Student::findOrFail($studentId);
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | IF STUDENT HAS NO SUPERVISOR
-        |--------------------------------------------------------------------------
-        */
+    /*
+    |--------------------------------------------------------------------------
+    | GET ALL ACTIVE SUPERVISOR ASSIGNMENTS
+    |--------------------------------------------------------------------------
+    */
 
-        if (!$assignment) {
-
-            return redirect()
-                ->back()
-                ->with(
-                    'error',
-                    'This student has no active supervisor.'
-                );
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | GET RESEARCH
-        |--------------------------------------------------------------------------
-        */
-
-        $research = ResearchProposal::where(
-            'student_id',
-            $studentId
-        )
-        ->latest()
-        ->first();
+    $assignments = SupervisorAssignment::with([
+        'student',
+        'supervisor'
+    ])
+    ->where(
+        'student_id',
+        $studentId
+    )
+    ->where(
+        'status',
+        'active'
+    )
+    ->orderBy(
+        'created_at',
+        'asc'
+    )
+    ->get();
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | NO RESEARCH
-        |--------------------------------------------------------------------------
-        */
+    /*
+    |--------------------------------------------------------------------------
+    | IF STUDENT HAS NO SUPERVISOR
+    |--------------------------------------------------------------------------
+    */
 
-        if (!$research) {
+    if ($assignments->isEmpty()) {
 
-            return redirect()
-                ->back()
-                ->with(
-                    'error',
-                    'This student has not submitted any research yet.'
-                );
+        return redirect()
+            ->back()
+            ->with(
+                'error',
+                'This student has no active supervisor.'
+            );
 
-        }
+    }
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | GET CORRECTIONS / SUPERVISOR RESPONSES
-        |--------------------------------------------------------------------------
-        |
-        | Kama table yako inaitwa research_corrections
-        |
-        */
+    /*
+    |--------------------------------------------------------------------------
+    | GET LATEST RESEARCH
+    |--------------------------------------------------------------------------
+    */
 
-        $corrections = DB::table(
-            'research_corrections'
-        )
+    $research = ResearchProposal::where(
+        'student_id',
+        $studentId
+    )
+    ->latest()
+    ->first();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | NO RESEARCH
+    |--------------------------------------------------------------------------
+    */
+
+    if (!$research) {
+
+        return redirect()
+            ->back()
+            ->with(
+                'error',
+                'This student has not submitted any research yet.'
+            );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | GET CORRECTIONS / SUPERVISOR RESPONSES
+    |--------------------------------------------------------------------------
+    */
+
+    $corrections = ResearchCorrection::with('supervisor')
         ->where(
             'research_proposal_id',
             $research->id
@@ -267,23 +271,22 @@ class UserController extends Controller
         ->get();
 
 
-        /*
-        |--------------------------------------------------------------------------
-        | RETURN DETAILS PAGE
-        |--------------------------------------------------------------------------
-        */
+    /*
+    |--------------------------------------------------------------------------
+    | RETURN DETAILS PAGE
+    |--------------------------------------------------------------------------
+    */
 
-        return view(
-            'research-details1',
-            compact(
-                'student',
-                'assignment',
-                'research',
-                'corrections'
-            )
-        );
-    }
-
+    return view(
+        'research-details1',
+        compact(
+            'student',
+            'assignments',
+            'research',
+            'corrections'
+        )
+    );
+}
 
 public function store1(Request $request)
 {
@@ -309,13 +312,13 @@ public function store1(Request $request)
             'Please select a student.',
 
         'core_teacher_id.required' =>
-            'Please select the Core Supervisor.',
+            'Please select the Co-Supervisor.',
 
         'principal_teacher_id.required' =>
             'Please select the Principal Supervisor.',
 
         'principal_teacher_id.different' =>
-            'Core Supervisor and Principal Supervisor must be different.',
+            'Co-Supervisor and Principal Supervisor must be different.',
     ]);
 
 
@@ -337,7 +340,7 @@ public function store1(Request $request)
         return back()
             ->withErrors([
                 'student_id' =>
-                    'This student already has a Core Supervisor.'
+                    'This student already has a Co-Supervisor.'
             ])
             ->withInput();
     }
@@ -387,7 +390,7 @@ public function store1(Request $request)
         ->route('supervisor.assignments.index')
         ->with(
             'success',
-            'Student has been assigned a Core Supervisor and a Principal Supervisor successfully.'
+            'Student has been assigned a Co-Supervisor and a Principal Supervisor successfully.'
         );
 }
     public function students()
@@ -405,4 +408,105 @@ public function store1(Request $request)
             compact('supervisor', 'assignments')
         );
     }
+    public function downloadTemplate()
+{
+    return Excel::download(
+        new StudentExport,
+        'student_import_template.xlsx'
+    );
 }
+
+    public function import(Request $request) { 
+        // ===================================================== // VALIDATE FILE // ===================================================== 
+        $request->validate( [ 'student_file' => 
+        [ 'required', 'file', 'mimes:xlsx,xls,csv', 'max:5120', ], ], 
+        [ 'student_file.required' => 'Please select a student file to upload.', 
+        'student_file.file' => 'The uploaded item must be a valid file.', 
+        'student_file.mimes' => 'Only Excel (.xlsx, .xls) or CSV files are allowed.', 
+        'student_file.max' => 'The student file must not be larger than 5MB.', ] ); 
+        try { 
+            // ===================================================== // IMPORT FILE // ===================================================== 
+            Excel::import( new StudentImport, $request->file('student_file') ); 
+            // ===================================================== // SUCCESS // =====================================================
+             return redirect() ->back() ->with( 'success', 'Students imported successfully.' ); } 
+             catch (ValidationException $e) { 
+                // ===================================================== // EXCEL VALIDATION ERRORS // ===================================================== 
+                $failures = $e->failures(); $errors = []; foreach ($failures as $failure) { $row = $failure->row(); $attribute = $failure->attribute(); foreach ($failure->errors() as $error) { $errors[] = "Row {$row} - {$attribute}: {$error}"; } } 
+                return redirect() ->back() ->with('import_errors', $errors); } catch (\Throwable $e) { 
+                    // ===================================================== // GENERAL ERROR // ===================================================== 
+                    Log::error( 'Student import failed', [ 'error' => $e->getMessage(), 'file' => $request->file('student_file') ? $request->file('student_file')->getClientOriginalName() : null, ] ); 
+                    return redirect() ->back() ->with( 'error', 'Students could not be imported. Please check your file and try again.' ); } }
+
+        public function updateSupervisor(Request $request, $studentId)
+{
+    $request->validate([
+        'supervisor_id'   => 'required|exists:system_users,id',
+        'supervisor_type' => 'required|in:principal,core',
+    ]);
+
+    // Hakikisha supervisor anayechaguliwa ni active supervisor
+    $supervisor = SystemUser::where('id', $request->supervisor_id)
+        ->where('role', 'supervisors')
+        ->where('status', 'active')
+        ->first();
+
+    if (!$supervisor) {
+        return back()->with(
+            'error',
+            'Selected user is not an active supervisor.'
+        );
+    }
+
+    // Zuia supervisor mmoja kuwa Principal na Co-Supervisor
+    $alreadyAssigned = SupervisorAssignment::where('student_id', $studentId)
+        ->where('teacher_id', $request->supervisor_id)
+        ->where('supervisor_type', '!=', $request->supervisor_type)
+        ->where('status', 'active')
+        ->exists();
+
+    if ($alreadyAssigned) {
+        return back()->with(
+            'error',
+            'This supervisor is already assigned to this student in another supervisor role.'
+        );
+    }
+
+    // Tafuta assignment iliyopo kwa aina husika
+    $assignment = SupervisorAssignment::where('student_id', $studentId)
+        ->where('supervisor_type', $request->supervisor_type)
+        ->first();
+
+    if ($assignment) {
+
+        // Update existing assignment
+        $assignment->update([
+            'teacher_id' => $request->supervisor_id,
+            'status'     => 'active',
+            'created_at' => now('Africa/Dar_es_Salaam'),
+            'updated_at' => now('Africa/Dar_es_Salaam'),
+        ]);
+
+    } else {
+
+        // Create new assignment
+        SupervisorAssignment::create([
+            'student_id'      => $studentId,
+            'teacher_id'      => $request->supervisor_id,
+            'supervisor_type' => $request->supervisor_type,
+            'status'          => 'active',
+            'created_at'      => now(),
+            'updated_at'      => now(),
+        ]);
+    }
+
+    return back()->with(
+        'success',
+        ucfirst($request->supervisor_type) .
+        ' supervisor updated successfully on ' .
+        now()->format('d M Y, h:i A') . '.'
+    );
+}
+public function forgot(){
+    return view('forgotpassword');
+}
+                    }
