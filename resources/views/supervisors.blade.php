@@ -37,7 +37,18 @@ tbody tr:hover{background:#f8fafc}
 
 
 <div class="staff-card">
-
+    <div style="display: flex;justify-content: end">
+ <button
+        type="button"
+        class="btn-add"
+        data-bs-toggle="modal"
+        data-bs-target="#addStaffModal"
+        style="float: end"
+    >
+        <i class="bi bi-person-plus-fill me-1"></i>
+        Add Staff
+    </button>
+    </div>
     <div class="table-top">
         <div class="search-box">
             <i class="bi bi-search"></i>
