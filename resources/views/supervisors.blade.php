@@ -113,11 +113,223 @@ tbody tr:hover{background:#f8fafc}
 
                     <td class="text-center">
 
-                        <a href="{{ route('staff.edit', $user->id) }}"
-                           class="action-btn action-edit"
-                           title="Edit">
-                            <i class="bi bi-pencil"></i>
-                        </a>
+                        <button type="button"
+        class="action-btn action-edit"
+        title="Edit"
+        data-bs-toggle="modal"
+        data-bs-target="#editStaffModal{{ $user->id }}">
+    <i class="bi bi-pencil"></i>
+</button>
+<div class="modal fade"
+         id="editStaffModal{{ $user->id }}"
+         tabindex="-1"
+         aria-labelledby="editStaffLabel{{ $user->id }}"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+
+            <div class="modal-content">
+
+                {{-- HEADER --}}
+                <div class="modal-header">
+
+                    <h5 class="modal-title"
+                        id="editStaffLabel{{ $user->id }}">
+
+                        <i class="bi bi-person-gear me-2"></i>
+                        Edit Staff
+
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                    </button>
+
+                </div>
+
+
+                {{-- FORM --}}
+                <form action="{{ route('staff.update', $user->id) }}"
+                      method="POST">
+
+                    @csrf
+                    @method('PUT')
+
+                    <div class="modal-body">
+
+                        <div class="row g-3">
+
+                            {{-- FIRST NAME --}}
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    First Name
+                                </label>
+
+                                <input type="text"
+                                       name="firstname"
+                                       class="form-control"
+                                       value="{{ $user->firstname }}"
+                                       required>
+
+                            </div>
+
+
+                            {{-- MIDDLE NAME --}}
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    Middle Name
+                                </label>
+
+                                <input type="text"
+                                       name="middlename"
+                                       class="form-control"
+                                       value="{{ $user->middlename }}">
+
+                            </div>
+
+
+                            {{-- LAST NAME --}}
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    Last Name
+                                </label>
+
+                                <input type="text"
+                                       name="lastname"
+                                       class="form-control"
+                                       value="{{ $user->lastname }}"
+                                       required>
+
+                            </div>
+
+
+                            {{-- PHONE --}}
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Phone
+                                </label>
+
+                                <input type="text"
+                                       name="phone"
+                                       class="form-control"
+                                       value="{{ $user->phone }}"
+                                       required>
+
+                            </div>
+
+
+                            {{-- EMAIL --}}
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Email
+                                </label>
+
+                                <input type="email"
+                                       name="email"
+                                       class="form-control"
+                                       value="{{ $user->email }}"
+                                       required>
+
+                            </div>
+
+
+                            {{-- ROLE --}}
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Role
+                                </label>
+
+                                <select name="role"
+                                        class="form-select"
+                                        required>
+
+                                    <option value="admin"
+                                        {{ $user->role === 'admin' ? 'selected' : '' }}>
+                                        Admin
+                                    </option>
+
+                                    <option value="supervisor"
+                                        {{ $user->role === 'supervisor' ? 'selected' : '' }}>
+                                        Supervisor
+                                    </option>
+
+                                    <option value="staff"
+                                        {{ $user->role === 'staff' ? 'selected' : '' }}>
+                                        Staff
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            {{-- STATUS --}}
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Status
+                                </label>
+
+                                <select name="status"
+                                        class="form-select"
+                                        required>
+
+                                    <option value="active"
+                                        {{ $user->status === 'active' ? 'selected' : '' }}>
+                                        Active
+                                    </option>
+
+                                    <option value="inactive"
+                                        {{ $user->status === 'inactive' ? 'selected' : '' }}>
+                                        Inactive
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- FOOTER --}}
+                    <div class="modal-footer">
+
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+
+                            <i class="bi bi-x-circle me-1"></i>
+                            Cancel
+
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary">
+
+                            <i class="bi bi-check-circle me-1"></i>
+                            Update Staff
+
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
 
                         {{-- @if($user->status === 'active')
 

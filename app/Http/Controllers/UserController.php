@@ -48,46 +48,29 @@ class UserController extends Controller
             ->with('success', 'Staff registered successfully.');
     }
 
-    public function edit(SystemUser $user)
-    {
-        return view('staff.edit', compact('user'));
-    }
+  
 
-    public function update(Request $request, SystemUser $user)
-    {
-        $validated = $request->validate([
-            'firstname'   => 'required|string|max:100',
-            'middlename'  => 'nullable|string|max:100',
-            'lastname'    => 'required|string|max:100',
-            'email'       => [
-                'required',
-                'email',
-                Rule::unique('users', 'email')->ignore($user->id),
-            ],
-            'phone'       => 'required|string|max:20',
-            'reg_number'  => [
-                'required',
-                'string',
-                'max:100',
-                Rule::unique('users', 'reg_number')->ignore($user->id),
-            ],
-            'role'        => 'required|in:teacher,supervisor,admin',
-        ]);
+    public function update(Request $request, $id)
+{
+    $staff = SystemUser::findOrFail($id);
 
-        if ($request->filled('password')) {
-            $request->validate([
-                'password' => 'string|min:6|confirmed',
-            ]);
+    $validated = $request->validate([
+        'firstname'  => 'required|string|max:100',
+        'middlename' => 'nullable|string|max:100',
+        'lastname'   => 'required|string|max:100',
 
-            $validated['password'] = Hash::make($request->password);
-        }
+        'phone' => 'required|string|max:30',
 
-        $user->update($validated);
+        'email' => 'required|email',
 
-        return redirect()
-            ->route('staff.index')
-            ->with('success', 'Staff updated successfully.');
-    }
+    ]);
+
+    $staff->update($validated);
+
+    return redirect()
+        ->back()
+        ->with('success', 'Staff updated successfully.');
+}
 
     public function block(SystemUser $user)
     {
