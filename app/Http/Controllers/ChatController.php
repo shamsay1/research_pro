@@ -15,55 +15,81 @@ class ChatController extends Controller
      * STUDENT CHAT
      * =========================================
      */
-    public function studentChat()
-    {
-        // Student aliye-login
-        $student = Auth::guard('student')->user();
+    public function studentChat(Request $request)
+{
+    // Student aliye-login
+    $student = Auth::guard('student')->user();
 
-        // Tafuta Admin
-        $admin = SystemUser::where('role', 'admin')
-            ->where('status', 'active')
-            ->first();
+    // Pata admins wote active
+    $admins = SystemUser::where('role', 'admin')
+        ->where('status', 'active')
+        ->orderBy('firstname', 'asc')
+        ->get();
 
-        // Kama hakuna Admin
-        if (!$admin) {
-            return back()->with(
-                'error',
-                'Administrator is not available at the moment.'
-            );
-        }
-
-        /*
-        |--------------------------------------------------------------------------
-        | Pata messages zote kati ya student huyu na admin
-        |--------------------------------------------------------------------------
-        */
-
-        $messages = ChatMessage::where('student_id', $student->id)
-            ->where('admin_id', $admin->id)
-            ->orderBy('created_at', 'asc')
-            ->get();
-
-        /*
-        |--------------------------------------------------------------------------
-        | Mark messages za Admin kuwa READ
-        |--------------------------------------------------------------------------
-        */
-
-        ChatMessage::where('student_id', $student->id)
-            ->where('admin_id', $admin->id)
-            ->where('sender_type', 'admin')
-            ->where('is_read', false)
-            ->update([
-                'is_read' => true
-            ]);
-
-        return view('chat', compact(
-            'student',
-            'admin',
-            'messages'
-        ));
+    // Kama hakuna admin
+    if ($admins->isEmpty()) {
+        return back()->with(
+            'error',
+            'Administrator is not available at the moment.'
+        );
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Admin aliyechaguliwa
+    |--------------------------------------------------------------------------
+    */
+
+    $selectedAdminId = $request->get('admin_id');
+
+    // Kama hakuna admin aliyechaguliwa,
+    // tumia admin wa kwanza
+    if (!$selectedAdminId) {
+        $selectedAdminId = $admins->first()->id;
+    }
+
+    // Hakikisha admin anayechaguliwa ni admin active
+    $admin = $admins->where('id', $selectedAdminId)->first();
+
+    // Kama admin huyo hayupo
+    if (!$admin) {
+        $admin = $admins->first();
+        $selectedAdminId = $admin->id;
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Pata messages za student huyu na admin huyu tu
+    |--------------------------------------------------------------------------
+    */
+
+    $messages = ChatMessage::where('student_id', $student->id)
+        ->where('admin_id', $admin->id)
+        ->orderBy('created_at', 'asc')
+        ->get();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mark messages za admin kuwa READ
+    |--------------------------------------------------------------------------
+    */
+
+    ChatMessage::where('student_id', $student->id)
+        ->where('admin_id', $admin->id)
+        ->where('sender_type', 'admin')
+        ->where('is_read', false)
+        ->update([
+            'is_read' => true
+        ]);
+
+    return view('chat', compact(
+        'student',
+        'admins',
+        'admin',
+        'messages',
+        'selectedAdminId'
+    ));
+}
 
 
     /**
@@ -72,86 +98,74 @@ class ChatController extends Controller
      * =========================================
      */
     public function sendMessage(Request $request)
-    {
-        /*
-        |--------------------------------------------------------------------------
-        | Validate message
-        |--------------------------------------------------------------------------
-        */
+{
+    // Student aliye-login
+    $student = Auth::guard('student')->user();
 
-        $request->validate([
-            'message' => [
-                'required',
-                'string',
-                'max:5000'
-            ],
-        ], [
-            'message.required' => 'Please enter a message.',
-            'message.max' => 'Message cannot exceed 5000 characters.',
-        ]);
+    /*
+    |--------------------------------------------------------------------------
+    | Validate
+    |--------------------------------------------------------------------------
+    */
 
+    $validated = $request->validate([
+        'admin_id' => [
+            'required',
+            'integer',
+            'exists:system_users,id',
+        ],
 
-        /*
-        |--------------------------------------------------------------------------
-        | Student aliye-login
-        |--------------------------------------------------------------------------
-        */
+        'message' => [
+            'required',
+            'string',
+            'max:5000',
+        ],
+    ]);
 
-        $student = Auth::guard('student')->user();
+    /*
+    |--------------------------------------------------------------------------
+    | Hakikisha admin ni active na role yake ni admin
+    |--------------------------------------------------------------------------
+    */
 
+    $admin = SystemUser::where('id', $validated['admin_id'])
+        ->where('role', 'admin')
+        ->where('status', 'active')
+        ->first();
 
-        /*
-        |--------------------------------------------------------------------------
-        | Tafuta Admin
-        |--------------------------------------------------------------------------
-        */
-
-        $admin = SystemUser::where('role', 'admin')
-            ->where('status', 'active')
-            ->first();
-
-
-        if (!$admin) {
-
-            return back()->with(
-                'error',
-                'Administrator is not available at the moment.'
-            );
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Save Message
-        |--------------------------------------------------------------------------
-        */
-
-        ChatMessage::create([
-
-            'student_id' => $student->id,
-
-            'admin_id' => $admin->id,
-
-            'sender_type' => 'student',
-
-            'message' => trim($request->message),
-
-            'is_read' => false,
-
-        ]);
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | Return to Chat
-        |--------------------------------------------------------------------------
-        */
-
-        return redirect()
-            ->route('student.chat')
-            ->with('success', 'Message sent successfully.');
+    if (!$admin) {
+        return back()->with(
+            'error',
+            'The selected administrator is not available.'
+        );
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Save message
+    |--------------------------------------------------------------------------
+    */
+
+    ChatMessage::create([
+        'student_id' => $student->id,
+        'admin_id' => $admin->id,
+        'sender_type' => 'student',
+        'message' => $validated['message'],
+        'is_read' => false,
+    ]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | Return kwenye conversation ya admin huyo
+    |--------------------------------------------------------------------------
+    */
+
+    return redirect()
+        ->route('student.chat', [
+            'admin_id' => $admin->id
+        ])
+        ->with('success', 'Message sent successfully.');
+}
 
 
   
@@ -300,7 +314,7 @@ class ChatController extends Controller
 
             'message' => trim($request->message),
 
-            'is_read' => false,
+            'is_read' => true,
 
         ]);
 

@@ -318,7 +318,7 @@
 
         <p>
 
-            Research proposals submitted by students assigned to you.
+            Research has been submitted by students assigned to you.
 
         </p>
 

@@ -1,604 +1,391 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Login | Research Tracking System</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <!-- Bootstrap 5 -->
+    <title>Forgot Password</title>
+
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
         rel="stylesheet"
     >
 
-    <!-- Bootstrap Icons -->
     <link
         rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     >
 
     <style>
-        /* ==========================
-   GOOGLE FONT
-========================== */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 
-/* ==========================
-   RESET
-========================== */
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+        body {
+            min-height: 100vh;
+            background: #f4f7fb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .forgot-card {
+            width: 100%;
+            max-width: 450px;
+            background: #ffffff;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,.08);
+        }
+
+        .forgot-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: #eaf7ef;
+            color: #198754;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: auto;
+            font-size: 30px;
+        }
+
+        .custom-input .form-control,
+        .custom-input .input-group-text {
+            height: 50px;
+            border-color: #dee2e6;
+        }
+
+        .custom-input .input-group-text {
+            background: #f8f9fa;
+        }
+
+        .login-btn {
+            height: 50px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .type-card {
+            cursor: pointer;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            transition: .2s;
+        }
+
+        .type-card:hover {
+            border-color: #198754;
+        }
+
+        .type-card.active {
+            border-color: #198754;
+            background: #f0faf4;
+        }
+
+        .type-card input {
+            display: none;
+        }
 
-body{
-    font-family:'Poppins',sans-serif;
-    background: lightblue;
-    min-height:100vh;
-}
-
-/* ==========================
-   MAIN CONTAINER
-========================== */
-.login-container{
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:20px;
-}
-
-/* ==========================
-   LOGIN CARD
-========================== */
-.login-box{
-    width:100%;
-    max-width:800px;
-    height:490px;
-    background:#fff;
-    border-radius:18px;
-    overflow:hidden;
-    box-shadow:0 15px 35px rgba(0,0,0,.12);
-}
-
-/* ==========================
-   LEFT SIDE
-========================== */
-.left-section{
-    position:relative;
-    height:560px;
-    background:url("https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80");
-    background-size:cover;
-    background-position:center;
-}
-
-.overlay{
-    position:absolute;
-    inset:0;
-    background:linear-gradient(rgba(13,31,64,.85),rgba(37,99,235,.75));
-}
-
-.left-content{
-    position:relative;
-    z-index:2;
-    height:100%;
-    color:#fff;
-    padding:35px;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-}
-
-.logo{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    font-size:22px;
-    font-weight:700;
-}
-
-.logo i{
-    font-size:28px;
-}
-
-.left-text h1{
-    font-size:36px;
-    line-height:1.2;
-    margin-bottom:18px;
-}
-
-.left-text p{
-    font-size:14px;
-    line-height:1.7;
-    color:rgba(255,255,255,.85);
-    margin-bottom:22px;
-}
-
-.features{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
-}
-
-.feature{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    font-size:14px;
-}
-
-.feature i{
-    color:#8bffb4;
-}
-
-.copyright-left{
-    font-size:12px;
-    color:rgba(255,255,255,.7);
-}
-
-/* ==========================
-   RIGHT SIDE
-========================== */
-.right-section{
-    display:flex;
-    align-items:center;
-    background:#fff;
-}
-
-.login-form-container{
-    width:100%;
-    padding:40px 50px;
-}
-
-.mobile-logo{
-    display:none;
-}
-
-.welcome{
-    margin-bottom:25px;
-}
-
-.welcome h2{
-    font-size:27px;
-    color:#0f172a;
-    font-weight:700;
-}
-
-.welcome p{
-    font-size:13px;
-    color:#64748b;
-}
-
-/* ==========================
-   FORM
-========================== */
-.form-label{
-    font-size:13px;
-    font-weight:600;
-    color:#334155;
-}
-
-.password-label{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-}
-
-.forgot-password{
-    text-decoration:none;
-    font-size:12px;
-    color:#2563eb;
-    font-weight:500;
-}
-
-.forgot-password:hover{
-    text-decoration:underline;
-}
-
-.custom-input{
-    height:48px;
-}
-
-.custom-input .input-group-text{
-    background:#f8fafc;
-    border:1px solid #dbe3ec;
-    color:#64748b;
-}
-
-.custom-input .form-control{
-    border:1px solid #dbe3ec;
-    background:#f8fafc;
-    font-size:14px;
-}
-
-.custom-input .form-control:focus{
-    background:#fff;
-    border-color:#2563eb;
-    box-shadow:none;
-}
-
-.custom-input:focus-within .input-group-text{
-    border-color:#2563eb;
-    color:#2563eb;
-}
-
-.password-toggle{
-    cursor:pointer;
-}
-
-.remember-row{
-    margin:18px 0 22px;
-}
-
-.form-check-label{
-    font-size:13px;
-    color:#64748b;
-}
-
-.form-check-input:checked{
-    background:#2563eb;
-    border-color:#2563eb;
-}
-
-#errorMessage{
-    font-size:13px;
-    border-radius:8px;
-}
-
-/* ==========================
-   BUTTON
-========================== */
-.login-btn{
-    height:48px;
-    background:#2563eb;
-    border:none;
-    color:#fff;
-    font-size:14px;
-    font-weight:600;
-    border-radius:8px;
-    transition:.3s;
-}
-
-.login-btn:hover{
-    background:#1d4ed8;
-    transform:translateY(-2px);
-    box-shadow:0 10px 18px rgba(37,99,235,.25);
-}
-
-.login-footer{
-    text-align:center;
-    margin-top:10px;
-}
-
-.login-footer p{
-    font-size:12px;
-    color:#64748b;
-    margin-bottom:3px;
-}
-
-.login-footer span{
-    font-size:11px;
-    color:#94a3b8;
-}
-
-/* ==========================
-   TABLET
-========================== */
-@media(max-width:992px){
-
-    .login-box{
-        max-width:760px;
-        height:520px;
-    }
-
-    .left-section{
-        height:520px;
-    }
-
-    .left-content{
-        padding:28px;
-    }
-
-    .left-text h1{
-        font-size:30px;
-    }
-
-    .login-form-container{
-        padding:35px;
-    }
-
-}
-
-/* ==========================
-   MOBILE
-========================== */
-@media(max-width:768px){
-
-    .login-container{
-        padding:0;
-    }
-
-    .login-box{
-        max-width:100%;
-        height:100vh;
-        border-radius:0;
-        box-shadow:none;
-    }
-
-    .left-section{
-        display:none;
-    }
-
-    .right-section{
-        min-height:100vh;
-        justify-content:center;
-    }
-
-    .login-form-container{
-        max-width:420px;
-        padding:30px 24px;
-    }
-
-    .mobile-logo{
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        margin-bottom:28px;
-    }
-
-    .mobile-logo-icon{
-        width:58px;
-        height:58px;
-        border-radius:14px;
-        background:#e8f0ff;
-        color:#2563eb;
-        display:flex;
-        justify-content:center;
-        align-items:center;
-        font-size:28px;
-        margin-bottom:10px;
-    }
-
-    .mobile-logo h4{
-        font-size:18px;
-        color:#0f172a;
-        font-weight:700;
-        text-align:center;
-    }
-
-    .welcome{
-        text-align:center;
-    }
-
-    .welcome h2{
-        font-size:24px;
-    }
-
-}
-
-/* ==========================
-   SMALL PHONE
-========================== */
-@media(max-width:400px){
-
-    .login-form-container{
-        padding:24px 18px;
-    }
-
-    .welcome h2{
-        font-size:22px;
-    }
-
-    .welcome p{
-        font-size:12px;
-    }
-
-}
     </style>
+
 </head>
 
 <body>
 
-<div class="login-container">
+<div class="forgot-card">
 
-    <div class="row g-0 login-box">
+    <div class="text-center mb-4">
 
-        <!-- ================= LEFT SIDE ================= -->
-        <div class="col-lg-6 left-section">
+        <div class="forgot-icon mb-3">
 
-            <div class="overlay"></div>
+            <i class="bi bi-key"></i>
 
-            <div class="left-content">
+        </div>
 
-                <div class="logo">
-                    <i class="bi bi-mortarboard-fill"></i>
-                    <span>RSTS</span>
-                </div>
+        <h4 class="fw-bold mb-2">
+            Forgot Password?
+        </h4>
 
-                <div class="left-text">
+        <p class="text-muted mb-0">
+            Select your account type and enter your email
+            to receive a verification token.
+        </p>
 
-                    <h1>
-                        Research Supervision Tracking System
-                    </h1>
+    </div>
 
-                    <p>
-                        Manage, track and monitor your research
-                        journey from proposal to completion.
-                    </p>
 
-                    <div class="features">
+    {{-- SUCCESS MESSAGE --}}
 
-                        <div class="feature">
-                            <i class="bi bi-check-circle-fill"></i>
-                            <span>Track Research Progress</span>
-                        </div>
+    @if(session('success'))
 
-                        <div class="feature">
-                            <i class="bi bi-check-circle-fill"></i>
-                            <span>Manage Research Projects</span>
-                        </div>
+        <div class="alert alert-success">
 
-                        <div class="feature">
-                            <i class="bi bi-check-circle-fill"></i>
-                            <span>Monitor Submission Status</span>
+            <i class="bi bi-check-circle me-2"></i>
+
+            {{ session('success') }}
+
+        </div>
+
+    @endif
+
+
+    {{-- ERROR MESSAGE --}}
+
+    @if(session('error'))
+
+        <div class="alert alert-danger">
+
+            <i class="bi bi-exclamation-circle me-2"></i>
+
+            {{ session('error') }}
+
+        </div>
+
+    @endif
+
+
+    {{-- VALIDATION ERRORS --}}
+
+    @if($errors->any())
+
+        <div class="alert alert-danger">
+
+            <ul class="mb-0">
+
+                @foreach($errors->all() as $error)
+
+                    <li>{{ $error }}</li>
+
+                @endforeach
+
+            </ul>
+
+        </div>
+
+    @endif
+
+
+    <form
+        action="{{ route('forgot.password.send') }}"
+        method="POST"
+        id="forgotPasswordForm"
+    >
+
+        @csrf
+
+
+        {{-- ACCOUNT TYPE --}}
+
+        <label class="form-label fw-semibold mb-2">
+            Account Type
+        </label>
+
+
+        <div class="row g-2 mb-3">
+
+
+            {{-- STUDENT --}}
+
+            <div class="col-6">
+
+                <label
+                    class="type-card w-100 active"
+                    id="studentCard"
+                >
+
+                    <input
+                        type="radio"
+                        name="user_type"
+                        value="student"
+                        checked
+                    >
+
+                    <div class="text-center">
+
+                        <i class="bi bi-mortarboard fs-3 text-success"></i>
+
+                        <div class="fw-semibold mt-1">
+                            Student
                         </div>
 
                     </div>
 
-                </div>
+                </label>
 
-                <div class="copyright-left">
-                    © 2026 Research Tracking System
-                </div>
+            </div>
+
+
+            {{-- ADMIN/SUPERVISOR --}}
+
+            <div class="col-6">
+
+                <label
+                    class="type-card w-100"
+                    id="staffCard"
+                >
+
+                    <input
+                        type="radio"
+                        name="user_type"
+                        value="staff"
+                    >
+
+                    <div class="text-center">
+
+                        <i class="bi bi-person-badge fs-3 text-primary"></i>
+
+                        <div class="fw-semibold mt-1">
+                            Admin / Supervisor
+                        </div>
+
+                    </div>
+
+                </label>
 
             </div>
 
         </div>
 
 
-        <!-- ================= RIGHT SIDE ================= -->
-        <div class="col-lg-6 right-section">
+        {{-- EMAIL --}}
 
-            <div class="login-form-container">
+        <div class="mb-4">
 
-                <div class="mobile-logo">
-                    <div class="mobile-logo-icon">
-                        <i class="bi bi-mortarboard-fill"></i>
-                    </div>
-
-                    <h4>Research Supervision Tracking System</h4>
-                </div>
-
-
-                <div class="welcome">
-                    <div style="text-align: center">
-                    <img src="{{ asset('images/ipalogo1.png') }}" width="100px" height="80px" style="float: center">
-                    </div>
-                    <h3 style="text-align: center;color: green;font-family: 'Times New Roman', Times, serif;font-size: 16px">INSTITUTE OF PUBLIC<br>ADMINISTRATION</h3>
-
-                </div>
-
-
-                <!-- Login Form -->
-                <p style="text-align: center">
-                    @if(session('error'))
-                    <span style="color: red">{{ session('error') }}</span>
-                    @endif
-                </p>
-               <form action="{{ route('login') }}" method="POST">
-
-    @csrf
-
-   
-
-
-    <!-- Password -->
-    <div class="mb-3">
-
-        <div class="password-label">
-
-            <label for="password" class="form-label">
+            <label
+                for="email"
+                class="form-label fw-semibold"
+            >
                 Email
             </label>
 
-            <a href="{{ route('login1') }}" class="forgot-password">
-                Back to login
-            </a>
+            <div class="input-group custom-input">
 
-        </div>
+                <span class="input-group-text">
 
-        <div class="input-group custom-input">
+                    <i class="bi bi-envelope"></i>
 
-            <span class="input-group-text">
-                <i class="bi bi-lock"></i>
-            </span>
+                </span>
 
-            <input
-                type="password"
-                class="form-control"
-                name="password"
-                placeholder="Enter your email"
-                required
-            >
-
-            <button
-                type="submit"
-                class="input-group-text password-toggle"
-            >
-                <i class="bi bi-eye" id="eyeIcon"></i>
-            </button>
-
-        </div>
-
-    </div>
-
-
-    <!-- Error -->
-    <div
-        id="errorMessage"
-        class="alert alert-danger d-none"
-    >
-        <i class="bi bi-exclamation-circle"></i>
-        <span id="errorText">
-            Invalid email or password.
-        </span>
-    </div>
-
-
-    <!-- Login Button -->
-    <button
-        type="submit"
-        class="btn login-btn w-100"
-        id="loginButton"
-    >
-
-        <span id="loginText">
-            Forgot Password
-        </span>
-
-        <span
-            id="loadingSpinner"
-            class="spinner-border spinner-border-sm d-none"
-        ></span>
-
-        <i
-            class="bi bi-arrow-right ms-2"
-            id="loginIcon"
-        ></i>
-
-    </button>
-
-</form>
-
-
-                <!-- Footer -->
-                <div class="login-footer">
-
-                    <p>
-                        © 2026 Research Tracking System v.1.0.0
-                    </p>
-
-            
-
-                </div>
+                <input
+                    type="email"
+                    name="email"
+                    id="email"
+                    class="form-control"
+                    placeholder="Enter your email"
+                    value="{{ old('email') }}"
+                    required
+                >
 
             </div>
 
         </div>
+
+
+        {{-- BUTTON --}}
+
+        <button
+            type="submit"
+            class="btn btn-success login-btn w-100"
+            id="sendButton"
+        >
+
+            <span id="buttonText">
+                Send Token
+            </span>
+
+            <span
+                id="buttonSpinner"
+                class="spinner-border spinner-border-sm d-none"
+            ></span>
+
+            <i
+                class="bi bi-arrow-right ms-2"
+                id="buttonIcon"
+            ></i>
+
+        </button>
+
+
+    </form>
+
+
+    <div class="text-center mt-4">
+
+        <a
+            href="{{ route('login1') }}"
+            class="text-decoration-none"
+        >
+
+            <i class="bi bi-arrow-left me-1"></i>
+
+            Back to login
+
+        </a>
 
     </div>
 
 </div>
 
 
-<!-- Bootstrap JS -->
-<script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+<script>
+
+    const studentCard = document.getElementById('studentCard');
+    const staffCard = document.getElementById('staffCard');
+
+    const radios = document.querySelectorAll(
+        'input[name="user_type"]'
+    );
+
+
+    radios.forEach(function(radio) {
+
+        radio.addEventListener('change', function() {
+
+            studentCard.classList.remove('active');
+            staffCard.classList.remove('active');
+
+
+            if (this.value === 'student') {
+
+                studentCard.classList.add('active');
+
+            } else {
+
+                staffCard.classList.add('active');
+
+            }
+
+        });
+
+    });
+
+
+    document
+        .getElementById('forgotPasswordForm')
+        .addEventListener('submit', function() {
+
+            document
+                .getElementById('sendButton')
+                .disabled = true;
+
+            document
+                .getElementById('buttonText')
+                .textContent = 'Sending...';
+
+            document
+                .getElementById('buttonSpinner')
+                .classList.remove('d-none');
+
+            document
+                .getElementById('buttonIcon')
+                .classList.add('d-none');
+
+        });
+
 </script>
-
-
 
 </body>
 </html>

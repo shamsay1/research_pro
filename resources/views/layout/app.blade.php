@@ -602,6 +602,53 @@
                 padding-right: 10px;
             }
         }
+        #pageLoader {
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.97);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999;
+        opacity: 1;
+        visibility: visible;
+        transition: opacity .3s ease, visibility .3s ease;
+    }
+
+    #pageLoader.hide {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .loader-box {
+        text-align: center;
+    }
+
+    .spinner {
+        width: 48px;
+        height: 48px;
+        border: 4px solid #e5e7eb;
+        border-top: 4px solid #2563eb;
+        border-radius: 50%;
+        animation: spin .8s linear infinite;
+        margin: 0 auto 12px;
+    }
+
+    .loader-text {
+        font-size: 14px;
+        font-weight: 600;
+        color: #475569;
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(360deg);
+        }
+    }
 
     </style>
 
@@ -609,14 +656,21 @@
 
 
 <body>
+    <div id="pageLoader">
+        <div class="loader-box">
+            <div class="spinner"></div>
+            <div class="loader-text">Loading...</div>
+        </div>
+    </div>
 
 
 
  @php
 
     // Chat unread count
-    $unreadChats = App\Models\ChatMessage::where('is_read', 0)->count();
-
+    if (Auth::guard('web')->check()) {
+    $unreadChats = App\Models\ChatMessage::where('is_read', 0)->where('admin_id',Auth::guard('web')->user()->id)->count();
+    }
     // Default values
     $notifications = collect();
     $unreadNotifications = 0;
@@ -715,6 +769,22 @@
         <i class="bi bi-person-check-fill"></i>
 
         <span>Assign Students</span>
+
+    </a>
+    <a href="{{ route('supervisor.students') }}" class="{{ Route::currentRouteName() == 'supervisor.students' ? 'active' : '' }}">
+
+        <i class="bi bi-people-fill"></i>
+
+        <span>My Students</span>
+
+    </a>
+
+
+    <a href="{{ route('supervisor.research') }}" class="{{ Route::currentRouteName() == 'supervisor.research' ? 'active' : '' }}">
+
+        <i class="bi bi-journal-text"></i>
+
+        <span>Researches</span>
 
     </a>
  <a href="{{ route('admin.chats') }}" class="chat-menu {{Route::currentRouteName() == 'admin.chats' ? 'active' : ''}}">
@@ -1068,7 +1138,7 @@
             @elseif (Auth::guard('web')->check() &&
             Auth::guard('web')->user()->role === 'supervisors')
             {{ Auth::guard('web')->user()->firstname.'    '.Auth::guard('web')->user()->middlename  }}
-            @else
+            @elseif(Auth::guard('student')->check())
               {{ Auth::guard('student')->user()->firstname.'  '.Auth::guard('student')->user()->middlename }}
 
             @endif
@@ -1211,6 +1281,21 @@
         );
 
     </script>
+    <script>
+    window.addEventListener('load', function () {
+
+        const loader = document.getElementById('pageLoader');
+
+        if (loader) {
+            loader.classList.add('hide');
+
+            setTimeout(function () {
+                loader.remove();
+            }, 300);
+        }
+
+    });
+</script>
 
 </body>
 

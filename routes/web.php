@@ -15,6 +15,95 @@ use Illuminate\Support\Facades\Route;
 // LOGIN
 // ===============================
 
+
+Route::middleware(['auth.check:web,student'])->group(function () {
+        Route::get(
+            '/dashboard',
+            [LoginController::class, 'dashboard']
+        )->name('dashboard');
+         Route::resource('/student',StudentController::class);
+         Route::get(
+    '/supervisor-assignments',
+    [UserController::class, 'index1']
+    )->name('supervisor.assignments.index');
+    Route::resource(
+                '/staff',
+                UserController::class
+            );
+    Route::get(
+    '/supervisor/students',
+        [UserController::class, 'students']
+    )->name('supervisor.students');
+    Route::get(
+    '/supervisor/research',
+    [ResearchProposalController::class, 'supervisorResearch']
+    )->name('supervisor.research');
+    Route::get( '/admin/chats', [ChatController::class, 'adminChats'] )->name('admin.chats');
+       Route::get( '/admin/research-report', [ResearchReportController::class, 'index'] )->name('admin.research.report'); 
+       Route::get(
+    '/admin/research/{studentId}',
+    [UserController::class, 'researchDetails']
+)->name('admin.research.details');
+Route::get(
+    '/researches',
+    [ResearchProposalController::class, 'index']
+)->name('student.research');
+Route::get(
+        '/student/research/responses',
+        [ResearchProposalController::class, 'responses']
+    )->name('student.research.responses');
+Route::get( '/chates/chat', [ChatController::class, 'studentChat'] )->name('student.chat'); 
+  Route::get(
+    '/settings',
+    [SettingsController::class, 'index']
+)->name('settings');      
+});
+
+    // Route::middleware(['auth.check:web', 'role:supervisors'])->group(function () {
+    //     Route::get(
+    //         '/dashboard',
+    //         [LoginController::class, 'dashboard']
+    //     )->name('dashboard');
+    //      Route::get(
+    // '/supervisor/students',
+    //     [UserController::class, 'students']
+    // )->name('supervisor.students');
+    // Route::get(
+    // '/supervisor/research',
+    // [ResearchProposalController::class, 'supervisorResearch']
+    // )->name('supervisor.research');
+        
+
+
+    // });
+
+
+
+
+
+
+
+
+
+
+
+
+        
+       
+        Route::patch(
+    '/staff/{user}/block',
+    [UserController::class, 'block']
+)->name('staff.block');
+
+Route::patch(
+    '/staff/{user}/unblock',
+    [UserController::class, 'unblock']
+)->name('staff.unblock');
+
+
+
+
+
 Route::get(
     '/',
     [LoginController::class, 'showlogin']
@@ -35,51 +124,29 @@ Route::post(
 // DASHBOARD
 // ===============================
 
-Route::get(
-    '/dashboard',
-    [LoginController::class, 'dashboard']
-)->name('dashboard');
+
 
 
 // ===============================
 // SUPERVISOR STUDENTS
 // ===============================
 
-Route::get(
-    '/supervisor/students',
-    [UserController::class, 'students']
-)->name('supervisor.students');
+
 
 
 // ===============================
 // STAFF
 // ===============================
 
-Route::resource(
-    '/staff',
-    UserController::class
-);
+
 Route::put('/student/{user}', [StudentController::class, 'update'])
     ->name('student.update');
-Route::patch(
-    '/staff/{user}/block',
-    [UserController::class, 'block']
-)->name('staff.block');
-
-Route::patch(
-    '/staff/{user}/unblock',
-    [UserController::class, 'unblock']
-)->name('staff.unblock');
-
 
 // ===============================
 // STUDENT RESEARCH
 // ===============================
 
-Route::get(
-    '/student/research',
-    [ResearchProposalController::class, 'index']
-)->name('student.research');
+
 Route::get('/students/template', [UserController::class, 'downloadTemplate'])
     ->name('students.template');
 Route::post('/students/import', [UserController::class, 'import'])
@@ -89,10 +156,7 @@ Route::post(
     [ResearchProposalController::class, 'store']
 )->name('student.research.store');
 
-Route::get(
-    '/supervisor/research',
-    [ResearchProposalController::class, 'supervisorResearch']
-)->name('supervisor.research');
+
 
 Route::get(
     '/supervisor/research/{research}',
@@ -121,10 +185,7 @@ Route::get(
     '/supervisor/research/{research}/download',
     [ResearchProposalController::class, 'download']
 )->name('supervisor.research.download');
-Route::get(
-        '/student/research/responses',
-        [ResearchProposalController::class, 'responses']
-    )->name('student.research.responses');
+
 Route::get(
         '/student/research/responses1/{id}',
         [ResearchProposalController::class, 'responses1']
@@ -151,10 +212,7 @@ Route::patch(
 // SUPERVISOR ASSIGNMENTS
 // ===============================
 
-Route::get(
-    '/supervisor-assignments',
-    [UserController::class, 'index1']
-)->name('supervisor.assignments.index');
+
 
 Route::post(
     '/supervisor-assignments',
@@ -165,26 +223,19 @@ Route::put(
     '/supervisor-assignments/{assignment}',
     [UserController::class, 'update']
 )->name('supervisor.assignments.update');
-Route::get(
-    '/settings',
-    [SettingsController::class, 'index']
-)->name('settings');
+
 
 Route::put(
     '/settings/password',
     [SettingsController::class, 'updatePassword']
 )->name('settings.password');
-Route::get( '/student/chat', [ChatController::class, 'studentChat'] )->name('student.chat'); 
 
-Route::resource('/student',StudentController::class);
-Route::get( '/admin/research-report', [ResearchReportController::class, 'index'] )->name('admin.research.report');
-Route::get(
-    '/admin/research/{studentId}',
-    [UserController::class, 'researchDetails']
-)->name('admin.research.details');
+
+
+
 Route::middleware('auth:student')->group(function () { 
 Route::post( '/student/chat/send', [ChatController::class, 'sendMessage'] )->name('student.chat.send'); });
-Route::get( '/admin/chats', [ChatController::class, 'adminChats'] )->name('admin.chats'); // Fungua chat ya student mmoja 
+ 
 Route::get( '/admin/chat/{studentId}', [ChatController::class, 'adminChat'] )->name('admin.chat'); 
 // Admin send message 
 Route::post('/notifications/clear-all', [
@@ -209,5 +260,21 @@ Route::delete(
     [ResearchProposalController::class, 'destroy']
 )->name('admin.research.destroy');
 Route::get('/forgotpassword',[UserController::class,'forgot'])->name('forgot');
+Route::post('/forgot-password/send-token', [UserController::class, 'sendToken'])
+    ->name('forgot.password.send');
+
+Route::get('/forgot-password/verify', [UserController::class, 'showVerifyToken'])
+    ->name('forgot.password.verify');
+
+Route::post('/forgot-password/verify', [UserController::class, 'verifyToken'])
+    ->name('forgot.password.verify.token');
+
+Route::get('/forgot-password/reset', [UserController::class, 'showResetPassword'])
+    ->name('forgot.password.reset');
+
+Route::post('/forgot-password/reset', [UserController::class, 'resetPassword'])
+    ->name('forgot.password.update');
+ Route::put('/settings/profile', [UserController::class, 'updateProfile'])
+        ->name('settings.profile');
 // =============================== // STUDENT // =============================== 
 // Route::resource( '/student', StudentController::class );

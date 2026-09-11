@@ -574,73 +574,82 @@ public function dashboard()
 
 
     public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+{
+    $request->validate([
+        'email' => 'required|email',
+        'password' => 'required',
+    ]);
 
-        $credentials = $request->only('email', 'password');
-
-
-        // =========================
-        // SYSTEM USER LOGIN
-        // =========================
-
-        if (Auth::guard('web')->attempt($credentials)) {
-
-            $request->session()->regenerate();
-
-            $user = Auth::guard('web')->user();
-
-            // ADMIN
-            if ($user->role === 'admin') {
-                return redirect()->route('dashboard');
-            }
-
-            // SUPERVISOR
-            if ($user->role === 'supervisors') {
-                return redirect()->route('dashboard');
-            }
-
-            // Role haijatambuliwa
-            Auth::guard('web')->logout();
-
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            return back()
-                ->withInput($request->only('email'))
-                ->with(
-                    'error',
-                    'Huna ruhusa ya kuingia kwenye mfumo.'
-                );
-        }
+    $credentials = $request->only('email', 'password');
 
 
-        // =========================
-        // STUDENT LOGIN
-        // =========================
+    // =====================================================
+    // SYSTEM USER LOGIN
+    // Admin / Supervisor / Teacher
+    // =====================================================
 
-        if (Auth::guard('student')->attempt($credentials)) {
+    if (Auth::guard('web')->attempt($credentials)) {
 
-            $request->session()->regenerate();
+        $request->session()->regenerate();
 
+        $user = Auth::guard('web')->user();
+
+        // ADMIN
+        if ($user->role === 'admin') {
             return redirect()->route('dashboard');
         }
 
+        // SUPERVISOR
+        if ($user->role === 'supervisors') {
+            return redirect()->route('dashboard');
+        }
 
-        // =========================
-        // LOGIN FAILED
-        // =========================
+        // TEACHER
+        if ($user->role === 'teacher') {
+            return redirect()->route('dashboard');
+        }
+
+        // =================================================
+        // ROLE HAITAMBULIKI
+        // =================================================
+
+        Auth::guard('web')->logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return back()
             ->withInput($request->only('email'))
             ->with(
                 'error',
-                'Email au password sio sahihi.'
+                'Huna ruhusa ya kuingia kwenye mfumo.'
             );
     }
+
+
+    // =====================================================
+    // STUDENT LOGIN
+    // =====================================================
+
+    if (Auth::guard('student')->attempt($credentials)) {
+
+        $request->session()->regenerate();
+
+        return redirect()->route('dashboard');
+    }
+
+
+    // =====================================================
+    // LOGIN FAILED
+    // =====================================================
+
+    return back()
+        ->withInput($request->only('email'))
+        ->with(
+            'error',
+            'Incorrect email or password.'
+        );
+}
 
 
     

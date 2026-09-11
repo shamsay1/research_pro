@@ -3,25 +3,138 @@
 @section('content')
 
 <style>
+
     .chat-container {
-        max-width: 1000px;
+        max-width: 1200px;
         margin: 0 auto;
     }
 
     .chat-card {
         background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0,0,0,.08);
+        border-radius: 18px;
+        box-shadow: 0 5px 25px rgba(0,0,0,.08);
         border: 1px solid #e5e7eb;
         overflow: hidden;
-        height: 650px;
+        height: 700px;
+        display: flex;
+    }
+
+    /* =====================================================
+       ADMIN SIDEBAR
+    ===================================================== */
+
+    .admin-sidebar {
+        width: 300px;
+        border-right: 1px solid #e5e7eb;
+        background: #fff;
         display: flex;
         flex-direction: column;
     }
 
-    /* ==============================
+    .admin-sidebar-header {
+        padding: 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .admin-sidebar-header h5 {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .admin-sidebar-header p {
+        margin: 5px 0 0;
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    .admin-list {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .admin-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px 18px;
+        text-decoration: none;
+        border-bottom: 1px solid #f1f5f9;
+        transition: .2s;
+        color: inherit;
+    }
+
+    .admin-item:hover {
+        background: #f8fafc;
+    }
+
+    .admin-item.active {
+        background: #eff6ff;
+        border-right: 3px solid #2563eb;
+    }
+
+    .admin-small-avatar {
+        width: 45px;
+        height: 45px;
+        min-width: 45px;
+        border-radius: 50%;
+        background: #2563eb;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .admin-item-info {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .admin-item-info h6 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: 700;
+        color: #1e293b;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .admin-item-info span {
+        display: block;
+        margin-top: 3px;
+        font-size: 11px;
+        color: #22c55e;
+    }
+
+    .online-dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #22c55e;
+        margin-right: 4px;
+    }
+
+
+    /* =====================================================
+       CHAT SECTION
+    ===================================================== */
+
+    .chat-section {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+
+    /* =====================================================
        CHAT HEADER
-    ============================== */
+    ===================================================== */
 
     .chat-header {
         padding: 18px 22px;
@@ -35,6 +148,7 @@
     .admin-avatar {
         width: 48px;
         height: 48px;
+        min-width: 48px;
         border-radius: 50%;
         background: #2563eb;
         color: #fff;
@@ -43,6 +157,10 @@
         justify-content: center;
         font-size: 21px;
         font-weight: 700;
+    }
+
+    .admin-info {
+        min-width: 0;
     }
 
     .admin-info h5 {
@@ -59,18 +177,10 @@
         color: #22c55e;
     }
 
-    .online-dot {
-        display: inline-block;
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: #22c55e;
-        margin-right: 4px;
-    }
 
-    /* ==============================
+    /* =====================================================
        CHAT BODY
-    ============================== */
+    ===================================================== */
 
     .chat-body {
         flex: 1;
@@ -100,9 +210,10 @@
         color: #334155;
     }
 
-    /* ==============================
+
+    /* =====================================================
        MESSAGE
-    ============================== */
+    ===================================================== */
 
     .message-wrapper {
         display: flex;
@@ -152,9 +263,22 @@
         margin-left: 3px;
     }
 
-    /* ==============================
-       CHAT FOOTER
-    ============================== */
+
+    /* =====================================================
+       DATE
+    ===================================================== */
+
+    .chat-date {
+        text-align: center;
+        margin: 15px 0;
+        color: #94a3b8;
+        font-size: 11px;
+    }
+
+
+    /* =====================================================
+       FOOTER
+    ===================================================== */
 
     .chat-footer {
         padding: 15px;
@@ -188,6 +312,7 @@
     .send-button {
         width: 45px;
         height: 45px;
+        min-width: 45px;
         border: none;
         border-radius: 50%;
         background: #2563eb;
@@ -204,35 +329,48 @@
         transform: scale(1.03);
     }
 
-    .send-button:disabled {
-        opacity: .6;
-        cursor: not-allowed;
-    }
 
-    /* ==============================
-       DATE
-    ============================== */
-
-    .chat-date {
-        text-align: center;
-        margin: 15px 0;
-        color: #94a3b8;
-        font-size: 11px;
-    }
-
-    /* ==============================
+    /* =====================================================
        MOBILE
-    ============================== */
+    ===================================================== */
 
     @media(max-width: 768px) {
-
-        .chat-container {
-            width: 100%;
-        }
 
         .chat-card {
             height: calc(100vh - 100px);
             border-radius: 10px;
+        }
+
+        .admin-sidebar {
+            width: 80px;
+        }
+
+        .admin-sidebar-header {
+            padding: 15px 10px;
+            text-align: center;
+        }
+
+        .admin-sidebar-header h5 {
+            font-size: 12px;
+        }
+
+        .admin-sidebar-header p {
+            display: none;
+        }
+
+        .admin-item {
+            justify-content: center;
+            padding: 12px 5px;
+        }
+
+        .admin-item-info {
+            display: none;
+        }
+
+        .admin-small-avatar {
+            width: 42px;
+            height: 42px;
+            min-width: 42px;
         }
 
         .chat-body {
@@ -244,198 +382,320 @@
         }
 
     }
+
 </style>
 
 
 <div class="chat-container">
 
-    {{-- =========================================
-         CHAT CARD
-    ========================================== --}}
-
     <div class="chat-card">
 
-        {{-- =========================================
-             HEADER
-        ========================================== --}}
 
-        <div class="chat-header">
+        {{-- =====================================================
+             ADMIN LIST
+        ====================================================== --}}
 
-            <div class="admin-avatar">
+        <div class="admin-sidebar">
 
-                <i class="bi bi-person-fill"></i>
-
-            </div>
-
-            <div class="admin-info">
+            <div class="admin-sidebar-header">
 
                 <h5>
-                    @if($admin)
-                        {{ $admin->firstname }}
-                        {{ $admin->lastname }}
-                    @else
-                        Administrator
-                    @endif
+                    <i class="bi bi-people me-1"></i>
+                    Administrators
                 </h5>
 
-                <span>
-                    <span class="online-dot"></span>
-                    Administrator
-                </span>
+                <p>
+                    Select administrator to chat
+                </p>
 
             </div>
 
-        </div>
+
+            <div class="admin-list">
+
+                @foreach($admins as $item)
+
+                    @php
+
+                        $initials =
+                            strtoupper(
+                                substr($item->firstname ?? 'A', 0, 1) .
+                                substr($item->lastname ?? '', 0, 1)
+                            );
+
+                    @endphp
 
 
-        {{-- =========================================
-             CHAT BODY
-        ========================================== --}}
+                    <a
+                        href="{{ route('student.chat', ['admin_id' => $item->id]) }}"
+                        class="admin-item
+                        {{ $admin->id == $item->id ? 'active' : '' }}"
+                    >
 
-        <div
-            class="chat-body"
-            id="chatBody"
-        >
+                        <div class="admin-small-avatar">
 
-            @if($messages->isEmpty())
-
-                <div class="empty-chat">
-
-                    <div>
-
-                        <i class="bi bi-chat-dots"></i>
-
-                        <h6>
-                            Start a conversation
-                        </h6>
-
-                        <p>
-                            Send a message to the administrator.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            @else
-
-                @php
-                    $lastDate = null;
-                @endphp
-
-                @foreach($messages as $message)
-
-                    {{-- DATE SEPARATOR --}}
-
-                    @if(
-                        $lastDate !==
-                        $message->created_at->format('Y-m-d')
-                    )
-
-                        <div class="chat-date">
-
-                            {{ $message->created_at->format('d F Y') }}
+                            {{ $initials }}
 
                         </div>
 
-                        @php
-                            $lastDate =
-                                $message->created_at->format('Y-m-d');
-                        @endphp
 
-                    @endif
+                        <div class="admin-item-info">
 
+                            <h6>
 
-                    {{-- MESSAGE --}}
+                                {{ $item->firstname }}
+                                {{ $item->lastname }}
 
-                    <div
-                        class="message-wrapper
-                        {{ $message->sender_type === 'student'
-                            ? 'student'
-                            : 'admin' }}"
-                    >
+                            </h6>
 
-                        <div
-                            class="message
-                            {{ $message->sender_type === 'student'
-                                ? 'student-message'
-                                : 'admin-message' }}"
-                        >
+                            <span>
 
-                            {{ $message->message }}
+                                <span class="online-dot"></span>
 
-                            <span class="message-time">
-
-                                {{ $message->created_at->format('h:i A') }}
-
-                                @if($message->sender_type === 'student')
-
-                                    <span class="message-status">
-
-                                        @if($message->is_read)
-
-                                            <i class="bi bi-check2-all"></i>
-
-                                        @else
-
-                                            <i class="bi bi-check2"></i>
-
-                                        @endif
-
-                                    </span>
-
-                                @endif
+                                Administrator
 
                             </span>
 
                         </div>
 
-                    </div>
+                    </a>
 
                 @endforeach
 
-            @endif
+            </div>
 
         </div>
 
 
-        {{-- =========================================
-             CHAT FOOTER
-        ========================================== --}}
 
-        <div class="chat-footer">
+        {{-- =====================================================
+             CHAT SECTION
+        ====================================================== --}}
 
-            <form
-                action="{{ route('student.chat.send') }}"
-                method="POST"
-                class="message-form"
-                id="messageForm"
+        <div class="chat-section">
+
+
+            {{-- =================================================
+                 HEADER
+            ================================================== --}}
+
+            <div class="chat-header">
+
+                @php
+
+                    $selectedInitials =
+                        strtoupper(
+                            substr($admin->firstname ?? 'A', 0, 1) .
+                            substr($admin->lastname ?? '', 0, 1)
+                        );
+
+                @endphp
+
+
+                <div class="admin-avatar">
+
+                    {{ $selectedInitials }}
+
+                </div>
+
+
+                <div class="admin-info">
+
+                    <h5>
+
+                        {{ $admin->firstname }}
+                        {{ $admin->lastname }}
+
+                    </h5>
+
+                    <span>
+
+                        <span class="online-dot"></span>
+
+                        Administrator
+
+                    </span>
+
+                </div>
+
+            </div>
+
+
+
+            {{-- =================================================
+                 CHAT BODY
+            ================================================== --}}
+
+            <div
+                class="chat-body"
+                id="chatBody"
             >
 
-                @csrf
+                @if($messages->isEmpty())
 
-                <textarea
-                    name="message"
-                    id="messageInput"
-                    class="message-input"
-                    placeholder="Write a message..."
-                    rows="1"
-                    required
-                ></textarea>
+                    <div class="empty-chat">
+
+                        <div>
+
+                            <i class="bi bi-chat-dots"></i>
+
+                            <h6>
+                                Start a conversation
+                            </h6>
+
+                            <p>
+                                Send a message to
+                                {{ $admin->firstname }}
+                                {{ $admin->lastname }}.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                @else
+
+                    @php
+                        $lastDate = null;
+                    @endphp
 
 
-                <button
-                    type="submit"
-                    class="send-button"
-                    id="sendButton"
-                    title="Send message"
+                    @foreach($messages as $message)
+
+                        {{-- DATE SEPARATOR --}}
+
+                        @if(
+                            $lastDate !==
+                            $message->created_at->format('Y-m-d')
+                        )
+
+                            <div class="chat-date">
+
+                                {{ $message->created_at->format('d F Y') }}
+
+                            </div>
+
+                            @php
+                                $lastDate =
+                                    $message->created_at->format('Y-m-d');
+                            @endphp
+
+                        @endif
+
+
+                        {{-- MESSAGE --}}
+
+                        <div
+                            class="message-wrapper
+                            {{ $message->sender_type === 'student'
+                                ? 'student'
+                                : 'admin' }}"
+                        >
+
+                            <div
+                                class="message
+                                {{ $message->sender_type === 'student'
+                                    ? 'student-message'
+                                    : 'admin-message' }}"
+                            >
+
+                                {{ $message->message }}
+
+
+                                <span class="message-time">
+
+                                    {{ $message->created_at->format('h:i A') }}
+
+
+                                    @if(
+                                        $message->sender_type === 'student'
+                                    )
+
+                                        <span class="message-status">
+
+                                            @if($message->is_read)
+
+                                                <i
+                                                    class="bi bi-check2-all"
+                                                ></i>
+
+                                            @else
+
+                                                <i
+                                                    class="bi bi-check2"
+                                                ></i>
+
+                                            @endif
+
+                                        </span>
+
+                                    @endif
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    @endforeach
+
+                @endif
+
+            </div>
+
+
+
+            {{-- =================================================
+                 CHAT FOOTER
+            ================================================== --}}
+
+            <div class="chat-footer">
+
+                <form
+                    action="{{ route('student.chat.send') }}"
+                    method="POST"
+                    class="message-form"
+                    id="messageForm"
                 >
 
-                    <i class="bi bi-send-fill"></i>
+                    @csrf
 
-                </button>
 
-            </form>
+                    {{-- IMPORTANT:
+                         Admin anayechaguliwa
+                    --}}
+
+                    <input
+                        type="hidden"
+                        name="admin_id"
+                        value="{{ $admin->id }}"
+                    >
+
+
+                    <textarea
+                        name="message"
+                        id="messageInput"
+                        class="message-input"
+                        placeholder="Write a message to {{ $admin->firstname }}..."
+                        rows="1"
+                        required
+                    ></textarea>
+
+
+                    <button
+                        type="submit"
+                        class="send-button"
+                        id="sendButton"
+                        title="Send message"
+                    >
+
+                        <i class="bi bi-send-fill"></i>
+
+                    </button>
+
+                </form>
+
+            </div>
 
         </div>
 
@@ -444,13 +704,15 @@
 </div>
 
 
-{{-- =========================================
+
+{{-- =========================================================
      JAVASCRIPT
-========================================== --}}
+========================================================= --}}
 
 <script>
 
-    const chatBody = document.getElementById('chatBody');
+    const chatBody =
+        document.getElementById('chatBody');
 
     const messageInput =
         document.getElementById('messageInput');
@@ -458,25 +720,32 @@
     const messageForm =
         document.getElementById('messageForm');
 
+    const sendButton =
+        document.getElementById('sendButton');
+
 
     /*
-    =========================================
-    SCROLL CHAT TO BOTTOM
-    =========================================
+    =========================================================
+    SCROLL TO BOTTOM
+    =========================================================
     */
 
     function scrollChatToBottom() {
 
-        chatBody.scrollTop =
-            chatBody.scrollHeight;
+        if (chatBody) {
+
+            chatBody.scrollTop =
+                chatBody.scrollHeight;
+
+        }
 
     }
 
 
     /*
-    =========================================
+    =========================================================
     INITIAL SCROLL
-    =========================================
+    =========================================================
     */
 
     document.addEventListener(
@@ -490,57 +759,93 @@
 
 
     /*
-    =========================================
+    =========================================================
     ENTER TO SEND
     SHIFT + ENTER = NEW LINE
-    =========================================
+    =========================================================
     */
 
-    messageInput.addEventListener(
-        'keydown',
-        function(event) {
+    if (messageInput) {
 
-            if (
-                event.key === 'Enter' &&
-                !event.shiftKey
-            ) {
+        messageInput.addEventListener(
+            'keydown',
+            function(event) {
 
-                event.preventDefault();
+                if (
+                    event.key === 'Enter' &&
+                    !event.shiftKey
+                ) {
 
-                if (messageInput.value.trim() !== '') {
+                    event.preventDefault();
 
-                    messageForm.submit();
+
+                    if (
+                        messageInput.value.trim() !== ''
+                    ) {
+
+                        messageForm.submit();
+
+                    }
 
                 }
 
             }
+        );
 
-        }
-    );
+
+        /*
+        =====================================================
+        AUTO RESIZE
+        =====================================================
+        */
+
+        messageInput.addEventListener(
+            'input',
+            function() {
+
+                this.style.height = 'auto';
+
+                this.style.height =
+                    Math.min(
+                        this.scrollHeight,
+                        100
+                    ) + 'px';
+
+            }
+        );
+
+    }
 
 
     /*
-    =========================================
-    AUTO RESIZE TEXTAREA
-    =========================================
+    =========================================================
+    DISABLE BUTTON AFTER SUBMIT
+    =========================================================
     */
 
-    messageInput.addEventListener(
-        'input',
-        function() {
+    if (messageForm) {
 
-            this.style.height = 'auto';
+        messageForm.addEventListener(
+            'submit',
+            function() {
 
-            this.style.height =
-                Math.min(
-                    this.scrollHeight,
-                    100
-                ) + 'px';
+                if (messageInput.value.trim() === '') {
 
-        }
-    );
+                    return false;
+
+                }
+
+                sendButton.disabled = true;
+
+                sendButton.innerHTML =
+                    '<i class="bi bi-hourglass-split"></i>';
+
+            }
+        );
+
+    }
 
 </script>
 
-@endsection
 
+@endsection

@@ -3,6 +3,14 @@
 @section('content')
 
 <style>
+    .search-loading {
+    min-height: 120px;
+}
+
+.search-loading .spinner-border {
+    width: 1.5rem;
+    height: 1.5rem;
+}
 .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
 .page-header h4{margin:0;font-size:22px;font-weight:700;color:#0f172a}
 .page-header p{margin:5px 0 0;font-size:18px;color:#64748b}
@@ -157,8 +165,18 @@ tbody tr:hover{background:#f8fafc}
 
     <div class="table-top">
         <div class="search-box">
-            <i class="bi bi-search"></i>
-            <input type="text" id="staffSearch" placeholder="Search staff...">
+            <div class="input-group">
+
+    <span class="input-group-text">
+        <i class="bi bi-search"></i>
+    </span>
+
+    <input type="text"
+           id="staffSearch"
+           class="form-control"
+           placeholder="Search student...">
+
+</div>
         </div>
 
         <div style="font-size:11px;color:#64748b">
@@ -167,305 +185,223 @@ tbody tr:hover{background:#f8fafc}
     </div>
 
     <div class="table-responsive">
-        <table class="table table-stried table-sm">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Mobile</th>
-                    <th>Email</th>
-                    <th>Reg Number</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th class="text-center">Action</th>
-                </tr>
-            </thead>
 
-            <tbody id="staffTable">
+    <table class="table table-striped table-sm" id="studentsTable">
 
-            @forelse($staff as $index => $user)
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Mobile</th>
+                <th>Email</th>
+                <th>Reg Number</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th class="text-center">Action</th>
+            </tr>
+        </thead>
 
-                <tr>
-                    <td>{{ $index + 1 }}</td>
+        {{-- AJAX RESULTS ZITAINGIA HAPA --}}
+        @include('partials.students_table')
 
-                    <td>
-                        <div class="staff-info">
-                            <div class="staff-avatar">
-                                <i class="bi bi-person"></i>
-                            </div>
+    </table>
 
-                            <div class="staff-name">
-                                {{ $user->firstname }}
-                                {{ $user->middlename }}
-                                {{ $user->lastname }}
-                            </div>
-                        </div>
-                    </td>
+</div>
 
-                    <td>{{ $user->phone }}</td>
+{{-- PAGINATION --}}
+<div id="studentsPagination" class="mt-3">
+    {{ $staff->links() }}
+</div>
+</div>
+@foreach($staff as $user)
 
-                    <td>{{ $user->email }}</td>
+    <div class="modal fade"
+         id="editStudentModal{{ $user->id }}"
+         tabindex="-1"
+         aria-labelledby="editStudentModalLabel{{ $user->id }}"
+         aria-hidden="true">
 
-                    <td>{{ $user->reg_number }}</td>
+        <div class="modal-dialog modal-lg modal-dialog-centered">
 
-                    <td>
-                        <span class="role-badge">
-                            {{ ucfirst($user->role) }}
-                        </span>
-                    </td>
+            <div class="modal-content">
 
-                    <td>
-                        <span class="status-badge {{ $user->status === 'active' ? 'status-active' : 'status-inactive' }}">
-                            {{ ucfirst($user->status) }}
-                        </span>
-                    </td>
 
-                    <td class="text-center">
+                {{-- HEADER --}}
+                <div class="modal-header">
 
-                        <button type="button"
-                            class="action-btn action-edit"
-                            title="Edit"
-                            data-bs-toggle="modal"
-                            data-bs-target="#editStudentModal{{ $user->id }}">
+                    <h5 class="modal-title"
+                        id="editStudentModalLabel{{ $user->id }}">
 
-                        <i class="bi bi-pencil"></i>
+                        <i class="bi bi-pencil-square me-2"></i>
+
+                        Edit Student Information
+
+                    </h5>
+
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
 
                     </button>
-                    <div class="modal fade"
-     id="editStudentModal{{ $user->id }}"
-     tabindex="-1"
-     aria-labelledby="editStudentModalLabel{{ $user->id }}"
-     aria-hidden="true">
 
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-
-        <div class="modal-content">
-
-            {{-- HEADER --}}
-            <div class="modal-header">
-
-                <h5 class="modal-title"
-                    id="editStudentModalLabel{{ $user->id }}">
-
-                    <i class="bi bi-pencil-square me-2"></i>
-                    Edit Student Information
-
-                </h5>
-
-                <button type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Close">
-                </button>
-
-            </div>
+                </div>
 
 
-            {{-- FORM --}}
-            <form action="{{ route('student.update', $user->id) }}"
-                  method="POST">
 
-                @csrf
+                {{-- FORM --}}
+                <form action="{{ route('student.update', $user->id) }}"
+                      method="POST">
 
-                @method('PUT')
+                    @csrf
 
-
-                <div class="modal-body">
-
-                    <div class="row g-3">
-
-                        {{-- FIRSTNAME --}}
-                        <div class="col-md-4">
-
-                            <label class="form-label">
-                                First Name
-                            </label>
-
-                            <input type="text"
-                                   name="firstname"
-                                   class="form-control"
-                                   value="{{ old('firstname', $user->firstname) }}"
-                                   required>
-
-                        </div>
+                    @method('PUT')
 
 
-                        {{-- MIDDLENAME --}}
-                        <div class="col-md-4">
+                    <div class="modal-body">
 
-                            <label class="form-label">
-                                Middle Name
-                            </label>
-
-                            <input type="text"
-                                   name="middlename"
-                                   class="form-control"
-                                   value="{{ old('middlename', $user->middlename) }}">
-
-                        </div>
+                        <div class="row g-3">
 
 
-                        {{-- LASTNAME --}}
-                        <div class="col-md-4">
+                            {{-- FIRST NAME --}}
+                            <div class="col-md-4">
 
-                            <label class="form-label">
-                                Last Name
-                            </label>
+                                <label class="form-label">
+                                    First Name
+                                </label>
 
-                            <input type="text"
-                                   name="lastname"
-                                   class="form-control"
-                                   value="{{ old('lastname', $user->lastname) }}"
-                                   required>
+                                <input type="text"
+                                       name="firstname"
+                                       class="form-control"
+                                       value="{{ $user->firstname }}"
+                                       required>
 
-                        </div>
-
-
-                        {{-- EMAIL --}}
-                        <div class="col-md-6">
-
-                            <label class="form-label">
-                                Email
-                            </label>
-
-                            <input type="email"
-                                   name="email"
-                                   class="form-control"
-                                   value="{{ old('email', $user->email) }}"
-                                   required>
-
-                        </div>
+                            </div>
 
 
-                        {{-- PHONE --}}
-                        <div class="col-md-6">
 
-                            <label class="form-label">
-                                Phone
-                            </label>
+                            {{-- MIDDLE NAME --}}
+                            <div class="col-md-4">
 
-                            <input type="text"
-                                   name="phone"
-                                   class="form-control"
-                                   value="{{ old('phone', $user->phone) }}">
+                                <label class="form-label">
+                                    Middle Name
+                                </label>
 
-                        </div>
+                                <input type="text"
+                                       name="middlename"
+                                       class="form-control"
+                                       value="{{ $user->middlename }}">
+
+                            </div>
 
 
-                        {{-- REG NUMBER --}}
-                        <div class="col-md-6">
 
-                            <label class="form-label">
-                                Registration Number
-                            </label>
+                            {{-- LAST NAME --}}
+                            <div class="col-md-4">
 
-                            <input type="text"
-                                   name="reg_number"
-                                   class="form-control"
-                                   value="{{ old('reg_number', $user->reg_number) }}"
-                                   required>
+                                <label class="form-label">
+                                    Last Name
+                                </label>
+
+                                <input type="text"
+                                       name="lastname"
+                                       class="form-control"
+                                       value="{{ $user->lastname }}"
+                                       required>
+
+                            </div>
+
+
+
+                            {{-- EMAIL --}}
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Email
+                                </label>
+
+                                <input type="email"
+                                       name="email"
+                                       class="form-control"
+                                       value="{{ $user->email }}"
+                                       required>
+
+                            </div>
+
+
+
+                            {{-- PHONE --}}
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Phone
+                                </label>
+
+                                <input type="text"
+                                       name="phone"
+                                       class="form-control"
+                                       value="{{ $user->phone }}">
+
+                            </div>
+
+
+
+                            {{-- REG NUMBER --}}
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Registration Number
+                                </label>
+
+                                <input type="text"
+                                       name="reg_number"
+                                       class="form-control"
+                                       value="{{ $user->reg_number }}"
+                                       required>
+
+                            </div>
+
 
                         </div>
 
                     </div>
 
-                </div>
 
 
-                {{-- FOOTER --}}
-                <div class="modal-footer">
+                    {{-- FOOTER --}}
+                    <div class="modal-footer">
 
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-bs-dismiss="modal">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
 
-                        <i class="bi bi-x-circle me-1"></i>
-                        Cancel
+                            <i class="bi bi-x-circle me-1"></i>
 
-                    </button>
+                            Cancel
+
+                        </button>
 
 
-                    <button type="submit"
-                            class="btn btn-primary">
+                        <button type="submit"
+                                class="btn btn-primary">
 
-                        <i class="bi bi-check-circle me-1"></i>
-                        Update Student
+                            <i class="bi bi-check-circle me-1"></i>
 
-                    </button>
+                            Update Student
 
-                </div>
+                        </button>
 
-            </form>
+                    </div>
+
+                </form>
+
+            </div>
 
         </div>
 
     </div>
-
-</div>
-
-                        {{-- @if($user->status === 'active')
-
-                            <form action="{{ route('student.block', $user->id) }}"
-                                  method="POST"
-                                  class="d-inline"
-                                  onsubmit="return confirm('Block this staff?')">
-                                @csrf
-                                @method('PATCH')
-
-                                <button class="action-btn action-block" title="Block">
-                                    <i class="bi bi-lock"></i>
-                                </button>
-                            </form>
-
-                        @else
-
-                            <form action="{{ route('student.unblock', $user->id) }}"
-                                  method="POST"
-                                  class="d-inline"
-                                  onsubmit="return confirm('Unblock this staff?')">
-                                @csrf
-                                @method('PATCH')
-
-                                <button class="action-btn action-unblock" title="Unblock">
-                                    <i class="bi bi-unlock"></i>
-                                </button>
-                            </form>
-
-                        @endif --}}
-
-                        <form action="{{ route('staff.destroy', $user->id) }}"
-                              method="POST"
-                              class="d-inline"
-                              onsubmit="return confirm('Delete this staff?')">
-                            @csrf
-                            @method('DELETE')
-
-                            <button class="action-btn action-delete" title="Delete">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </form>
-
-                    </td>
-                </tr>
-
-            @empty
-
-                <tr>
-                    <td colspan="8" class="text-center py-4">
-                        No Student found
-                    </td>
-                </tr>
-
-            @endforelse
-
-            </tbody>
-        </table>
-        <div>
-            {{ $staff->links() }}
-        </div>
-    </div>
-</div>
-
+@endforeach
 
 {{-- ADD STAFF MODAL --}}
 <div class="modal fade" id="addStaffModal" tabindex="-1">
@@ -642,13 +578,116 @@ tbody tr:hover{background:#f8fafc}
 </script>
 @endif
 <script>
-document.getElementById('staffSearch').addEventListener('keyup', function () {
-    const search = this.value.toLowerCase();
 
-    document.querySelectorAll('#staffTable tr').forEach(row => {
-        row.style.display = row.innerText.toLowerCase().includes(search) ? '' : 'none';
+document.addEventListener('DOMContentLoaded', function () {
+
+    const searchInput = document.getElementById('staffSearch');
+
+    let searchTimeout;
+
+    searchInput.addEventListener('keyup', function () {
+
+        const search = this.value.trim();
+
+        clearTimeout(searchTimeout);
+
+        searchTimeout = setTimeout(function () {
+
+            // SHOW LOADING SPINNER
+            const table = document.getElementById('studentsTable');
+            const tbody = table.querySelector('tbody');
+
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center py-5">
+
+                        <div class="d-flex justify-content-center align-items-center">
+
+                            <div class="spinner-border text-primary me-2"
+                                 role="status"
+                                 style="width: 1.5rem; height: 1.5rem;">
+
+                                <span class="visually-hidden">
+                                    Loading...
+                                </span>
+
+                            </div>
+
+                            <span class="text-muted">
+                                Searching students...
+                            </span>
+
+                        </div>
+
+                    </td>
+                </tr>
+            `;
+
+
+            // SEND AJAX REQUEST
+            fetch(
+                `{{ route('student.index') }}?search=${encodeURIComponent(search)}`,
+                {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/html'
+                    }
+                }
+            )
+
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error('Search request failed');
+                }
+
+                return response.text();
+
+            })
+
+            .then(html => {
+
+                // REMOVE SPINNER
+                // AND SHOW SEARCH RESULTS
+                const table = document.getElementById('studentsTable');
+
+                const oldTbody = table.querySelector('tbody');
+
+                oldTbody.outerHTML = html;
+
+            })
+
+            .catch(error => {
+
+                console.error('Search error:', error);
+
+                // SHOW ERROR INSTEAD OF SPINNER
+                const table = document.getElementById('studentsTable');
+
+                const tbody = table.querySelector('tbody');
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-5">
+
+                            <i class="bi bi-exclamation-triangle text-danger fs-3"></i>
+
+                            <div class="mt-2 text-danger">
+                                Failed to search students.
+                            </div>
+
+                        </td>
+                    </tr>
+                `;
+
+            });
+
+        }, 300);
+
     });
+
 });
+
 </script>
 
 @endsection

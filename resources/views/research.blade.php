@@ -342,11 +342,11 @@
     <div class="research-header">
 
         <h4>
-            Research Proposal
+            Research Submission
         </h4>
 
         <p>
-            Submit your research proposal to your supervisor.
+            Submit your research to your supervisor.
         </p>
 
     </div>
@@ -560,7 +560,7 @@
             </h5>
 
             <p>
-                Your research has been submitted successfully
+                Your research work has been submitted successfully
                 and is waiting for your supervisor's review.
             </p>
 
@@ -594,7 +594,7 @@
 
             <p>
                 Your supervisor is currently reviewing
-                your research proposal.
+                your research submission.
             </p>
 
             <span class="status status-under_review">
@@ -795,7 +795,7 @@
 
             <p>
                 Congratulations! Your supervisor has approved
-                your research proposal.
+                your research submission.
             </p>
 
             <span class="status status-approved">

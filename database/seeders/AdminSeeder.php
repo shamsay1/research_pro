@@ -14,14 +14,14 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        $admin = SystemUser::where('email','admin@gmail.com')->first();
+        $admin = SystemUser::where('email','hamad.said@ipa.ac.tz')->first();
         if(!$admin){
             SystemUser::create([
-                'firstname' => 'JUMA',
-                'middlename' => 'HAJI',
-                'lastname' => 'JUMA',
-                'email' => 'admin@gmail.com',
-                'phone' => '07738383',
+                'firstname' => 'HAMAD',
+                'middlename' => 'KHAMIS',
+                'lastname' => 'SAID',
+                'email' => 'hamad.said@ipa.ac.tz',
+                'phone' => '0777430694',
                 'role' => 'admin',
                 'password' => Hash::make('12345678')
 

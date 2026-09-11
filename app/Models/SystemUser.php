@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class SystemUser extends Authenticatable
 {
     use HasFactory, Notifiable;
-
+    protected $table = 'system_users';
     protected $fillable = [
         'firstname',
         'middlename',

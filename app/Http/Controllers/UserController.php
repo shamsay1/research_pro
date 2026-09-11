@@ -15,17 +15,60 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Validators\ValidationException;
 class UserController extends Controller
 {
-    public function index()
-    {
-        $staff = SystemUser::where('role','!=','admin')->latest()->get();
+    public function index(Request $request)
+{
+    $search = $request->input('search');
 
-        return view('supervisors', compact('staff'));
+    $staff = SystemUser::query()
+        ->where('role', '!=', 'admin')
+
+        ->when($search, function ($query) use ($search) {
+
+            $query->where(function ($q) use ($search) {
+
+                $q->where('firstname', 'like', "%{$search}%")
+                  ->orWhere('middlename', 'like', "%{$search}%")
+                  ->orWhere('lastname', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('role', 'like', "%{$search}%")
+                  ->orWhere('status', 'like', "%{$search}%");
+
+            });
+
+        })
+
+        ->latest()
+        ->paginate(10)
+        ->withQueryString();
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | AJAX REQUEST
+    |--------------------------------------------------------------------------
+    */
+
+    if ($request->ajax()) {
+
+        return view(
+            'partials.staff_rows',
+            compact('staff')
+        )->render();
+
     }
+
+
+    return view('supervisors', compact('staff'));
+}
 
     public function store(Request $request)
     {
@@ -60,7 +103,7 @@ class UserController extends Controller
         'lastname'   => 'required|string|max:100',
 
         'phone' => 'required|string|max:30',
-
+         'role' => 'required',
         'email' => 'required|email',
 
     ]);
@@ -69,7 +112,7 @@ class UserController extends Controller
 
     return redirect()
         ->back()
-        ->with('success', 'Staff updated successfully.');
+        ->with('success', 'Data updated successfully.');
 }
 
     public function block(SystemUser $user)
@@ -489,7 +532,604 @@ public function store1(Request $request)
         now()->format('d M Y, h:i A') . '.'
     );
 }
-public function forgot(){
-    return view('forgotpassword');
+    public function forgot(){
+        return view('forgotpassword');
+    }
+
+    public function sendToken(Request $request)
+    {
+        $request->validate([
+            'user_type' => 'required|in:student,staff',
+            'email' => 'required|email',
+        ], [
+            'user_type.required' => 'Please select account type.',
+            'email.required' => 'Please enter your email.',
+            'email.email' => 'Please enter a valid email address.',
+        ]);
+
+
+        $email = strtolower(trim($request->email));
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FIND USER
+        |--------------------------------------------------------------------------
+        */
+
+        if ($request->user_type === 'student') {
+
+            $user = Student::where('email', $email)->first();
+
+            if (!$user) {
+
+                return back()
+                    ->withInput()
+                    ->with('error', 'Email not found in student accounts.');
+
+            }
+
+        } else {
+
+            $user = SystemUser::where('email', $email)
+                ->whereIn('role', ['admin', 'supervisors'])
+                ->first();
+
+            if (!$user) {
+
+                return back()
+                    ->withInput()
+                    ->with('error', 'Email not found in admin/supervisor accounts.');
+
+            }
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | GENERATE 4 DIGIT TOKEN
+        |--------------------------------------------------------------------------
+        */
+
+        $token = (string) random_int(1000, 9999);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DELETE OLD TOKEN
+        |--------------------------------------------------------------------------
+        */
+
+        DB::table('password_reset_tokens')
+            ->where('email', $email)
+            ->delete();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SAVE TOKEN
+        |--------------------------------------------------------------------------
+        |
+        | We hash the token in database for security.
+        |
+        */
+
+        DB::table('password_reset_tokens')->insert([
+            'email' => $email,
+            'token' => Hash::make($token),
+            'created_at' => now(),
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SAVE TEMPORARY INFORMATION IN SESSION
+        |--------------------------------------------------------------------------
+        */
+
+        session([
+            'password_reset_email' => $email,
+            'password_reset_type' => $request->user_type,
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SEND EMAIL
+        |--------------------------------------------------------------------------
+        */
+
+        $fullName = trim(
+            $user->firstname . ' ' .
+            $user->middlename . ' ' .
+            $user->lastname
+        );
+
+
+        try {
+
+            Mail::html(
+                view('passwordreset', [
+                    'name' => $fullName,
+                    'token' => $token,
+                ])->render(),
+
+                function ($message) use ($email) {
+
+                    $message
+                        ->to($email)
+                        ->subject('Password Reset Token - IPA Research Tracking System');
+
+                }
+            );
+
+        } catch (\Throwable $e) {
+
+    DB::table('password_reset_tokens')
+        ->where('email', $email)
+        ->delete();
+
+    return back()
+        ->withInput()
+        ->with(
+            'error',
+            'Email sending failed: ' . $e->getMessage()
+        );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REDIRECT TO TOKEN PAGE
+        |--------------------------------------------------------------------------
+        */
+
+        return redirect()
+            ->route('forgot.password.verify')
+            ->with(
+                'success',
+                'A 4-digit verification token has been sent to your email.'
+            );
+    }
+
+
+
+    public function showVerifyToken()
+    {
+        if (!session()->has('password_reset_email')) {
+
+            return redirect()
+                ->route('forgot.password')
+                ->with('error', 'Please request a password reset token first.');
+
+        }
+
+
+        return view('verifytokens');
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | VERIFY TOKEN
+    |--------------------------------------------------------------------------
+    */
+
+    public function verifyToken(Request $request)
+    {
+        $request->validate([
+            'token' => [
+                'required',
+                'digits:4',
+            ],
+        ], [
+            'token.required' => 'Please enter the verification token.',
+            'token.digits' => 'Token must contain exactly 4 digits.',
+        ]);
+
+
+        $email = session('password_reset_email');
+
+
+        if (!$email) {
+
+            return redirect()
+                ->route('forgot')
+                ->with('error', 'Your password reset session has expired.');
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | GET TOKEN
+        |--------------------------------------------------------------------------
+        */
+
+        $reset = DB::table('password_reset_tokens')
+            ->where('email', $email)
+            ->first();
+
+
+        if (!$reset) {
+
+            return back()
+                ->with('error', 'Invalid or expired token.');
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOKEN EXPIRATION - 10 MINUTES
+        |--------------------------------------------------------------------------
+        */
+
+        if (
+            Carbon::parse($reset->created_at)
+                ->addMinutes(10)
+                ->isPast()
+        ) {
+
+            DB::table('password_reset_tokens')
+                ->where('email', $email)
+                ->delete();
+
+            return redirect()
+                ->route('forgot')
+                ->with(
+                    'error',
+                    'Your token has expired. Please request a new token.'
+                );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CHECK TOKEN
+        |--------------------------------------------------------------------------
+        */
+
+        if (!Hash::check($request->token, $reset->token)) {
+
+            return back()
+                ->withInput()
+                ->with('error', 'Incorrect token. Please check your email.');
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOKEN VERIFIED
+        |--------------------------------------------------------------------------
+        */
+
+        session([
+            'password_reset_verified' => true,
+        ]);
+
+
+        return redirect()
+            ->route('forgot.password.reset')
+            ->with(
+                'success',
+                'Token verified successfully. You can now reset your password.'
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SHOW RESET PASSWORD PAGE
+    |--------------------------------------------------------------------------
+    */
+
+    public function showResetPassword()
+    {
+        if (
+            !session()->has('password_reset_email') ||
+            !session('password_reset_verified')
+        ) {
+
+            return redirect()
+                ->route('forgot.password')
+                ->with(
+                    'error',
+                    'Please verify your token first.'
+                );
+        }
+
+
+        return view('resetpassword');
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | RESET PASSWORD
+    |--------------------------------------------------------------------------
+    */
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'confirmed',
+            ],
+        ], [
+            'password.required' => 'Please enter your new password.',
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.confirmed' => 'Passwords do not match.',
+        ]);
+
+
+        $email = session('password_reset_email');
+        $type = session('password_reset_type');
+
+
+        if (!$email || !$type || !session('password_reset_verified')) {
+
+            return redirect()
+                ->route('forgot.password')
+                ->with(
+                    'error',
+                    'Your password reset session has expired.'
+                );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | UPDATE STUDENT PASSWORD
+        |--------------------------------------------------------------------------
+        */
+
+        if ($type === 'student') {
+
+            $user = Student::where('email', $email)->first();
+
+
+            if (!$user) {
+
+                return redirect()
+                    ->route('forgot.password')
+                    ->with('error', 'Student account was not found.');
+
+            }
+
+
+            $user->password = Hash::make($request->password);
+            $user->save();
+
+
+        } else {
+
+            /*
+            |--------------------------------------------------------------------------
+            | UPDATE ADMIN / SUPERVISOR PASSWORD
+            |--------------------------------------------------------------------------
+            */
+
+            $user = SystemUser::where('email', $email)
+                ->whereIn('role', ['admin', 'supervisors'])
+                ->first();
+
+
+            if (!$user) {
+
+                return redirect()
+                    ->route('forgot.password')
+                    ->with(
+                        'error',
+                        'Admin/Supervisor account was not found.'
+                    );
+
+            }
+
+
+            $user->password = Hash::make($request->password);
+            $user->save();
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | DELETE USED TOKEN
+        |--------------------------------------------------------------------------
+        */
+
+        DB::table('password_reset_tokens')
+            ->where('email', $email)
+            ->delete();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CLEAR RESET SESSION
+        |--------------------------------------------------------------------------
+        */
+
+        session()->forget([
+            'password_reset_email',
+            'password_reset_type',
+            'password_reset_verified',
+        ]);
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | BACK TO LOGIN
+        |--------------------------------------------------------------------------
+        */
+
+        return redirect()
+            ->route('login1')
+            ->with(
+                'success',
+                'Your password has been reset successfully. You can now login.'
+            );
+    }
+    public function updateProfile(Request $request)
+    {
+        /*
+        |--------------------------------------------------------------------------
+        | CHECK STUDENT
+        |--------------------------------------------------------------------------
+        */
+
+        if (Auth::guard('student')->check()) {
+
+            $user = Auth::guard('student')->user();
+
+            $validated = $request->validate([
+
+                'firstname' => [
+                    'required',
+                    'string',
+                    'max:100',
+                ],
+
+                'middlename' => [
+                    'nullable',
+                    'string',
+                    'max:100',
+                ],
+
+                'lastname' => [
+                    'required',
+                    'string',
+                    'max:100',
+                ],
+
+                'email' => [
+                    'required',
+                    'email',
+                    'max:255',
+                    Rule::unique('students', 'email')
+                        ->ignore($user->id),
+                ],
+
+                'phone' => [
+                    'nullable',
+                    'string',
+                    'max:30',
+                ],
+            ], [
+
+                'firstname.required' => 'First name is required.',
+
+                'lastname.required' => 'Last name is required.',
+
+                'email.required' => 'Email address is required.',
+
+                'email.email' => 'Please enter a valid email address.',
+
+                'email.unique' => 'This email is already being used by another student.',
+            ]);
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | UPDATE STUDENT
+            |--------------------------------------------------------------------------
+            */
+
+            $user->firstname = $validated['firstname'];
+            $user->middlename = $validated['middlename'] ?? null;
+            $user->lastname = $validated['lastname'];
+            $user->email = $validated['email'];
+            $user->phone = $validated['phone'] ?? null;
+
+            $user->save();
+
+
+            return back()->with(
+                'success',
+                'Your profile has been updated successfully.'
+            );
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | CHECK ADMIN / SUPERVISOR
+        |--------------------------------------------------------------------------
+        */
+
+        if (Auth::guard('web')->check()) {
+
+            $user = Auth::guard('web')->user();
+
+            $validated = $request->validate([
+
+                'firstname' => [
+                    'required',
+                    'string',
+                    'max:100',
+                ],
+
+                'middlename' => [
+                    'nullable',
+                    'string',
+                    'max:100',
+                ],
+
+                'lastname' => [
+                    'required',
+                    'string',
+                    'max:100',
+                ],
+
+                'email' => [
+                    'required',
+                    'email',
+                    'max:255',
+                    Rule::unique('system_users', 'email')
+                        ->ignore($user->id),
+                ],
+
+                'phone' => [
+                    'nullable',
+                    'string',
+                    'max:30',
+                ],
+            ], [
+
+                'firstname.required' => 'First name is required.',
+
+                'lastname.required' => 'Last name is required.',
+
+                'email.required' => 'Email address is required.',
+
+                'email.email' => 'Please enter a valid email address.',
+
+                'email.unique' => 'This email is already being used by another system user.',
+            ]);
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | UPDATE SYSTEM USER
+            |--------------------------------------------------------------------------
+            */
+
+            $user->firstname = $validated['firstname'];
+            $user->middlename = $validated['middlename'] ?? null;
+            $user->lastname = $validated['lastname'];
+            $user->email = $validated['email'];
+            $user->phone = $validated['phone'] ?? null;
+
+            $user->save();
+
+
+            return back()->with(
+                'success',
+                'Your profile has been updated successfully.'
+            );
+        }
+    }
 }
-                    }

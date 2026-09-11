@@ -487,6 +487,11 @@ body{
                     <span style="color: red">{{ session('error') }}</span>
                     @endif
                 </p>
+                <p style="text-align: center">
+                    @if(session('success'))
+                    <span style="color: green">{{ session('success') }}</span>
+                    @endif
+                </p>
                <form action="{{ route('login') }}" method="POST">
 
     @csrf

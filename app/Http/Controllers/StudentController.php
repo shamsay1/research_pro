@@ -10,12 +10,33 @@ use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
-     public function index()
-    {
-        $staff = Student::paginate(10);
+     public function index(Request $request)
+{
+    $search = $request->input('search');
 
-        return view('students', compact('staff'));
+    $staff = Student::query()
+        ->when($search, function ($query) use ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('firstname', 'like', "%{$search}%")
+                  ->orWhere('middlename', 'like', "%{$search}%")
+                  ->orWhere('lastname', 'like', "%{$search}%")
+                  ->orWhere('phone', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%")
+                  ->orWhere('reg_number', 'like', "%{$search}%")
+                  ->orWhere('role', 'like', "%{$search}%")
+                  ->orWhere('status', 'like', "%{$search}%");
+            });
+        })
+        ->paginate(5)
+        ->withQueryString();
+
+    // AJAX request
+    if ($request->ajax()) {
+        return view('partials.students_table', compact('staff'))->render();
     }
+
+    return view('students', compact('staff'));
+}
 
     public function store(Request $request)
     {
@@ -38,56 +59,30 @@ class StudentController extends Controller
             ->with('success', 'Student registered successfully.');
     }
 
-    public function update(Request $request, Student $user)
+   public function update(Request $request, Student $student)
 {
     $validated = $request->validate([
-        'firstname' => [
-            'required',
-            'string',
-            'max:255',
-        ],
-
-        'middlename' => [
-            'nullable',
-            'string',
-            'max:255',
-        ],
-
-        'lastname' => [
-            'required',
-            'string',
-            'max:255',
-        ],
-
-        'email' => [
-            'required',
-            'email',
-            'max:255',
-            'unique:students,email,' . $user->id,
-        ],
-
-        'phone' => [
-            'nullable',
-            'string',
-            'max:30',
-        ],
-
-        'reg_number' => [
-            'required',
-            'string',
-            'max:100',
-            'unique:students,reg_number,' . $user->id,
-        ],
+        'firstname' => ['required', 'string', 'max:255'],
+        'middlename' => ['nullable', 'string', 'max:255'],
+        'lastname' => ['required', 'string', 'max:255'],
+        'email' => ['required', 'email', 'max:255'],
+        'phone' => ['nullable', 'string', 'max:30'],
+        'reg_number' => ['required', 'string', 'max:100'],
     ]);
 
-    $user->update($validated);
+    $student->firstname = $validated['firstname'];
+    $student->middlename = $validated['middlename'] ?? null;
+    $student->lastname = $validated['lastname'];
+    $student->email = $validated['email'];
+    $student->phone = $validated['phone'] ?? null;
+    $student->reg_number = $validated['reg_number'];
+
+    $student->save();
 
     return redirect()
-        ->back()
+        ->route('student.index')
         ->with('success', 'Student information updated successfully.');
 }
-    
-
     public function block(Student $user)
     {
         $user->update(['status' => 'inactive']);

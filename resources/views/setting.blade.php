@@ -75,6 +75,7 @@
     width:45px;
     height:45px;
     border-radius:12px;
+
     background:#dbeafe;
     color:#2563eb;
 
@@ -151,6 +152,10 @@
 }
 
 
+/* =========================================================
+   PROFILE INFORMATION
+========================================================= */
+
 .profile-info{
     display:flex;
     flex-direction:column;
@@ -187,6 +192,37 @@
 
 
 /* =========================================================
+   EDIT PROFILE BUTTON
+========================================================= */
+
+.edit-profile-btn{
+    width:100%;
+    border:none;
+    border-radius:9px;
+
+    padding:12px;
+
+    background:#2563eb;
+    color:#fff;
+
+    font-size:14px;
+    font-weight:600;
+
+    transition:.2s;
+}
+
+.edit-profile-btn:hover{
+    background:#1d4ed8;
+    color:#fff;
+}
+
+.edit-profile-btn:disabled{
+    opacity:.7;
+    cursor:not-allowed;
+}
+
+
+/* =========================================================
    FORM
 ========================================================= */
 
@@ -202,6 +238,23 @@
     font-size:13px;
     font-weight:600;
 }
+
+.form-control{
+    border-radius:8px;
+    padding:11px 13px;
+}
+
+.form-control:focus{
+    border-color:#2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(37,99,235,.1);
+}
+
+
+/* =========================================================
+   PASSWORD
+========================================================= */
 
 .password-wrapper{
     position:relative;
@@ -227,18 +280,6 @@
 
 .password-toggle:hover{
     color:#2563eb;
-}
-
-.form-control{
-    border-radius:8px;
-    padding:11px 13px;
-}
-
-.form-control:focus{
-    border-color:#2563eb;
-
-    box-shadow:
-        0 0 0 3px rgba(37,99,235,.1);
 }
 
 
@@ -272,7 +313,7 @@
 
 
 /* =========================================================
-   BUTTON
+   PASSWORD BUTTON
 ========================================================= */
 
 .update-password-btn{
@@ -312,6 +353,39 @@
 
 
 /* =========================================================
+   MODAL
+========================================================= */
+
+#editProfileModal .modal-content{
+    border-radius:16px;
+    overflow:hidden;
+}
+
+#editProfileModal .modal-header{
+    padding:20px 24px;
+    border-bottom:1px solid #e2e8f0;
+}
+
+#editProfileModal .modal-body{
+    padding:24px;
+}
+
+#editProfileModal .modal-footer{
+    padding:16px 24px;
+    border-top:1px solid #e2e8f0;
+}
+
+#editProfileModal .form-control{
+    min-height:45px;
+}
+
+.profile-readonly{
+    background:#f8fafc !important;
+    color:#64748b;
+}
+
+
+/* =========================================================
    RESPONSIVE
 ========================================================= */
 
@@ -319,6 +393,10 @@
 
     .settings-grid{
         grid-template-columns:1fr;
+    }
+
+    .settings-container{
+        padding:0 10px;
     }
 
 }
@@ -346,8 +424,9 @@
     </div>
 
 
+
     {{-- =====================================================
-         SUCCESS
+         SUCCESS MESSAGE
     ====================================================== --}}
 
     @if(session('success'))
@@ -363,8 +442,9 @@
     @endif
 
 
+
     {{-- =====================================================
-         ERROR
+         ERROR MESSAGE
     ====================================================== --}}
 
     @if($errors->any())
@@ -380,6 +460,7 @@
     @endif
 
 
+
     <div class="settings-grid">
 
 
@@ -389,6 +470,8 @@
 
         <div class="settings-card">
 
+
+            {{-- CARD HEADER --}}
 
             <div class="card-header-custom">
 
@@ -413,34 +496,49 @@
             </div>
 
 
-            {{-- PROFILE TOP --}}
+
+            {{-- =================================================
+                 PROFILE TOP
+            ================================================== --}}
 
             <div class="profile-top">
 
+
+                {{-- AVATAR --}}
 
                 <div class="profile-avatar">
 
                     @php
 
-                        $name =
-                            $user->name
-                            ?? $user->full_name
-                            ?? 'U';
+                        $name = trim(
+                            ($user->firstname ?? '') . ' ' .
+                            ($user->middlename ?? '') . ' ' .
+                            ($user->lastname ?? '')
+                        );
 
-                        $words =
-                            preg_split(
-                                '/\s+/',
-                                trim($name)
-                            );
+                        if(empty(trim($name))) {
+                            $name = 'User';
+                        }
+
+                        $words = preg_split(
+                            '/\s+/',
+                            trim($name)
+                        );
 
                         $initials = '';
 
-                        foreach(array_slice($words, 0, 2) as $word){
+                        foreach(
+                            array_slice($words, 0, 2)
+                            as $word
+                        ){
 
-                            $initials .=
-                                strtoupper(
+                            if(!empty($word)){
+
+                                $initials .= strtoupper(
                                     substr($word, 0, 1)
                                 );
+
+                            }
 
                         }
 
@@ -452,12 +550,18 @@
                 </div>
 
 
+
+                {{-- NAME --}}
+
                 <div class="profile-name">
 
                     {{ $name }}
 
                 </div>
 
+
+
+                {{-- ROLE --}}
 
                 <span class="profile-role">
 
@@ -467,7 +571,7 @@
 
                     @else
 
-                        {{ $user->role ?? 'System User' }}
+                        {{ ucfirst($user->role ?? 'System User') }}
 
                     @endif
 
@@ -476,28 +580,72 @@
             </div>
 
 
-            {{-- PROFILE INFORMATION --}}
+
+            {{-- =================================================
+                 PROFILE INFORMATION
+            ================================================== --}}
 
             <div class="profile-info">
 
 
-                {{-- NAME --}}
+                {{-- FIRST NAME --}}
 
                 <div class="profile-item">
 
                     <span class="profile-label">
 
-                        Full Name
+                        First Name
 
                     </span>
 
                     <span class="profile-value">
 
-                        {{ $name }}
+                        {{ $user->firstname }}
 
                     </span>
 
                 </div>
+
+
+
+                {{-- MIDDLE NAME --}}
+
+                <div class="profile-item">
+
+                    <span class="profile-label">
+
+                        Middle Name
+
+                    </span>
+
+                    <span class="profile-value">
+
+                        {{ $user->middlename ?: 'Not provided' }}
+
+                    </span>
+
+                </div>
+
+
+
+                {{-- LAST NAME --}}
+
+                <div class="profile-item">
+
+                    <span class="profile-label">
+
+                        Last Name
+
+                    </span>
+
+                    <span class="profile-value">
+
+                        {{ $user->lastname }}
+
+                    </span>
+
+                </div>
+
 
 
                 {{-- EMAIL --}}
@@ -512,14 +660,35 @@
 
                     <span class="profile-value">
 
-                        {{ $user->email ?? 'Not provided' }}
+                        {{ $user->email }}
 
                     </span>
 
                 </div>
 
 
-                {{-- STUDENT ID --}}
+
+                {{-- PHONE --}}
+
+                <div class="profile-item">
+
+                    <span class="profile-label">
+
+                        Phone
+
+                    </span>
+
+                    <span class="profile-value">
+
+                        {{ $user->phone ?: 'Not provided' }}
+
+                    </span>
+
+                </div>
+
+
+
+                {{-- STUDENT REGISTRATION NUMBER --}}
 
                 @if($guard === 'student')
 
@@ -527,13 +696,13 @@
 
                         <span class="profile-label">
 
-                            Student ID
+                            Registration Number
 
                         </span>
 
                         <span class="profile-value">
 
-                            {{ $user->student_id ?? $user->registration_number ?? $user->id }}
+                            {{ $user->reg_number }}
 
                         </span>
 
@@ -542,7 +711,8 @@
                 @endif
 
 
-                {{-- ROLE --}}
+
+                {{-- SYSTEM USER ROLE --}}
 
                 @if($guard === 'web')
 
@@ -556,13 +726,14 @@
 
                         <span class="profile-value">
 
-                            {{ $user->role ?? 'System User' }}
+                            {{ ucfirst($user->role ?? 'System User') }}
 
                         </span>
 
                     </div>
 
                 @endif
+
 
 
                 {{-- ACCOUNT ID --}}
@@ -583,6 +754,29 @@
 
                 </div>
 
+
+            </div>
+
+
+
+            {{-- =================================================
+                 EDIT PROFILE BUTTON
+            ================================================== --}}
+
+            <div class="mt-4">
+
+                <button
+                    type="button"
+                    class="edit-profile-btn"
+                    data-bs-toggle="modal"
+                    data-bs-target="#editProfileModal"
+                >
+
+                    <i class="bi bi-pencil-square me-1"></i>
+
+                    Edit Profile
+
+                </button>
 
             </div>
 
@@ -624,6 +818,7 @@
             </div>
 
 
+
             <form
                 action="{{ route('settings.password') }}"
                 method="POST"
@@ -659,7 +854,10 @@
                         <button
                             type="button"
                             class="password-toggle"
-                            onclick="togglePassword('current_password', this)"
+                            onclick="togglePassword(
+                                'current_password',
+                                this
+                            )"
                         >
 
                             <i class="bi bi-eye"></i>
@@ -680,6 +878,7 @@
                     @enderror
 
                 </div>
+
 
 
                 {{-- NEW PASSWORD --}}
@@ -706,7 +905,10 @@
                         <button
                             type="button"
                             class="password-toggle"
-                            onclick="togglePassword('password', this)"
+                            onclick="togglePassword(
+                                'password',
+                                this
+                            )"
                         >
 
                             <i class="bi bi-eye"></i>
@@ -727,6 +929,7 @@
                     @enderror
 
                 </div>
+
 
 
                 {{-- CONFIRM PASSWORD --}}
@@ -768,6 +971,7 @@
                 </div>
 
 
+
                 {{-- PASSWORD INFO --}}
 
                 <div class="password-info">
@@ -799,7 +1003,8 @@
                 </div>
 
 
-                {{-- BUTTON --}}
+
+                {{-- PASSWORD BUTTON --}}
 
                 <button
                     type="submit"
@@ -825,29 +1030,406 @@
 
 </div>
 
+
+
+{{-- =========================================================
+     EDIT PROFILE MODAL
+========================================================= --}}
+
+<div
+    class="modal fade"
+    id="editProfileModal"
+    tabindex="-1"
+    aria-labelledby="editProfileModalLabel"
+    aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+
+        <div class="modal-content border-0 shadow">
+
+
+            {{-- MODAL HEADER --}}
+
+            <div class="modal-header">
+
+                <div>
+
+                    <h5
+                        class="modal-title fw-bold"
+                        id="editProfileModalLabel"
+                    >
+
+                        <i class="bi bi-person-gear text-primary me-2"></i>
+
+                        Edit My Profile
+
+                    </h5>
+
+                    <small class="text-muted">
+
+                        Update your personal account information
+
+                    </small>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                ></button>
+
+            </div>
+
+
+
+            {{-- =================================================
+                 PROFILE FORM
+            ================================================== --}}
+
+            <form
+                action="{{ route('settings.profile') }}"
+                method="POST"
+                id="profileForm"
+            >
+
+                @csrf
+
+                @method('PUT')
+
+
+                <div class="modal-body">
+
+                    <div class="row g-3">
+
+
+                        {{-- FIRST NAME --}}
+
+                        <div class="col-md-4">
+
+                            <label class="form-label fw-semibold">
+
+                                First Name
+
+                            </label>
+
+                            <input
+                                type="text"
+                                name="firstname"
+                                class="form-control @error('firstname') is-invalid @enderror"
+                                value="{{ old('firstname', $user->firstname) }}"
+                                placeholder="First name"
+                                required
+                            >
+
+                            @error('firstname')
+
+                                <div class="invalid-feedback">
+
+                                    {{ $message }}
+
+                                </div>
+
+                            @enderror
+
+                        </div>
+
+
+
+                        {{-- MIDDLE NAME --}}
+
+                        <div class="col-md-4">
+
+                            <label class="form-label fw-semibold">
+
+                                Middle Name
+
+                            </label>
+
+                            <input
+                                type="text"
+                                name="middlename"
+                                class="form-control @error('middlename') is-invalid @enderror"
+                                value="{{ old('middlename', $user->middlename) }}"
+                                placeholder="Middle name"
+                            >
+
+                            @error('middlename')
+
+                                <div class="invalid-feedback">
+
+                                    {{ $message }}
+
+                                </div>
+
+                            @enderror
+
+                        </div>
+
+
+
+                        {{-- LAST NAME --}}
+
+                        <div class="col-md-4">
+
+                            <label class="form-label fw-semibold">
+
+                                Last Name
+
+                            </label>
+
+                            <input
+                                type="text"
+                                name="lastname"
+                                class="form-control @error('lastname') is-invalid @enderror"
+                                value="{{ old('lastname', $user->lastname) }}"
+                                placeholder="Last name"
+                                required
+                            >
+
+                            @error('lastname')
+
+                                <div class="invalid-feedback">
+
+                                    {{ $message }}
+
+                                </div>
+
+                            @enderror
+
+                        </div>
+
+
+
+                        {{-- EMAIL --}}
+
+                        <div class="col-md-6">
+
+                            <label class="form-label fw-semibold">
+
+                                Email Address
+
+                            </label>
+
+                            <input
+                                type="email"
+                                name="email"
+                                class="form-control @error('email') is-invalid @enderror"
+                                value="{{ old('email', $user->email) }}"
+                                placeholder="Email address"
+                                required
+                            >
+
+                            @error('email')
+
+                                <div class="invalid-feedback">
+
+                                    {{ $message }}
+
+                                </div>
+
+                            @enderror
+
+                        </div>
+
+
+
+                        {{-- PHONE --}}
+
+                        <div class="col-md-6">
+
+                            <label class="form-label fw-semibold">
+
+                                Phone Number
+
+                            </label>
+
+                            <input
+                                type="text"
+                                name="phone"
+                                class="form-control @error('phone') is-invalid @enderror"
+                                value="{{ old('phone', $user->phone) }}"
+                                placeholder="Phone number"
+                            >
+
+                            @error('phone')
+
+                                <div class="invalid-feedback">
+
+                                    {{ $message }}
+
+                                </div>
+
+                            @enderror
+
+                        </div>
+
+
+
+                        {{-- =================================================
+                             STUDENT REGISTRATION NUMBER
+                        ================================================== --}}
+
+                        @if($guard === 'student')
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-semibold">
+
+                                    Registration Number
+
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control profile-readonly"
+                                    value="{{ $user->reg_number }}"
+                                    readonly
+                                >
+
+                                <small class="text-muted">
+
+                                    Registration number cannot be changed here.
+
+                                </small>
+
+                            </div>
+
+                        @endif
+
+
+
+                        {{-- =================================================
+                             SYSTEM USER ROLE
+                        ================================================== --}}
+
+                        @if($guard === 'web')
+
+                            <div class="col-md-6">
+
+                                <label class="form-label fw-semibold">
+
+                                    Role
+
+                                </label>
+
+                                <input
+                                    type="text"
+                                    class="form-control profile-readonly"
+                                    value="{{ ucfirst($user->role ?? 'System User') }}"
+                                    readonly
+                                >
+
+                                <small class="text-muted">
+
+                                    Your role cannot be changed from your profile.
+
+                                </small>
+
+                            </div>
+
+                        @endif
+
+
+                    </div>
+
+                </div>
+
+
+
+                {{-- =================================================
+                     MODAL FOOTER
+                ================================================== --}}
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn btn-light"
+                        data-bs-dismiss="modal"
+                    >
+
+                        <i class="bi bi-x-circle me-1"></i>
+
+                        Cancel
+
+                    </button>
+
+
+                    <button
+                        type="submit"
+                        class="btn btn-primary"
+                        id="updateProfileButton"
+                    >
+
+                        <i class="bi bi-check-circle me-1"></i>
+
+                        Update Profile
+
+                    </button>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+{{-- =========================================================
+     SWEETALERT
+========================================================= --}}
+
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+
 @if(session('success'))
+
 <script>
+
 Swal.fire({
+
     icon: 'success',
+
     title: 'Success!',
-    text: '{{ session('success') }}',
-    confirmButtonText: 'OK'
+
+    text: @json(session('success')),
+
+    confirmButtonText: 'OK',
+
+    confirmButtonColor: '#2563eb'
+
 });
+
 </script>
+
 @endif
+
+
+
+{{-- =========================================================
+     JAVASCRIPT
+========================================================= --}}
+
 <script>
+
 
 /*
 |--------------------------------------------------------------------------
-| Toggle Password
+| TOGGLE PASSWORD
 |--------------------------------------------------------------------------
 */
 
-function togglePassword(
-    inputId,
-    button
-){
+function togglePassword(inputId, button)
+{
 
     const input =
         document.getElementById(inputId);
@@ -885,15 +1467,56 @@ function togglePassword(
 }
 
 
+
 /*
 |--------------------------------------------------------------------------
-| Password Submit Loading
+| PROFILE UPDATE LOADING
 |--------------------------------------------------------------------------
 */
 
-document
-    .getElementById('passwordForm')
-    .addEventListener(
+const profileForm =
+    document.getElementById('profileForm');
+
+
+if(profileForm){
+
+    profileForm.addEventListener(
+        'submit',
+        function(){
+
+            const button =
+                document.getElementById(
+                    'updateProfileButton'
+                );
+
+
+            button.disabled = true;
+
+
+            button.innerHTML =
+                '<span class="spinner-border spinner-border-sm me-1"></span>' +
+                'Updating Profile...';
+
+        }
+    );
+
+}
+
+
+
+/*
+|--------------------------------------------------------------------------
+| PASSWORD UPDATE LOADING
+|--------------------------------------------------------------------------
+*/
+
+const passwordForm =
+    document.getElementById('passwordForm');
+
+
+if(passwordForm){
+
+    passwordForm.addEventListener(
         'submit',
         function(){
 
@@ -902,15 +1525,64 @@ document
                     'updatePasswordButton'
                 );
 
+
             button.disabled = true;
 
+
             button.innerHTML =
-                '<span class="spinner-border spinner-border-sm me-1"></span>'
-                + 'Updating Password...';
+                '<span class="spinner-border spinner-border-sm me-1"></span>' +
+                'Updating Password...';
 
         }
     );
 
+}
+
 </script>
+
+
+
+{{-- =========================================================
+     OPEN PROFILE MODAL AFTER VALIDATION ERROR
+========================================================= --}}
+
+@if(
+    $errors->has('firstname') ||
+    $errors->has('middlename') ||
+    $errors->has('lastname') ||
+    $errors->has('email') ||
+    $errors->has('phone')
+)
+
+<script>
+
+document.addEventListener(
+    'DOMContentLoaded',
+    function(){
+
+        const modalElement =
+            document.getElementById(
+                'editProfileModal'
+            );
+
+
+        if(modalElement){
+
+            const modal =
+                new bootstrap.Modal(
+                    modalElement
+                );
+
+            modal.show();
+
+        }
+
+    }
+);
+
+</script>
+
+@endif
+
 
 @endsection
