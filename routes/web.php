@@ -276,5 +276,12 @@ Route::post('/forgot-password/reset', [UserController::class, 'resetPassword'])
     ->name('forgot.password.update');
  Route::put('/settings/profile', [UserController::class, 'updateProfile'])
         ->name('settings.profile');
+Route::get(
+        '/admin/research/student/{studentId}/print',
+        [
+            ResearchReportController::class,
+            'studentReport'
+        ]
+    )->name('admin.research.student.print');
 // =============================== // STUDENT // =============================== 
 // Route::resource( '/student', StudentController::class );
