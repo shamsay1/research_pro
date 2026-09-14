@@ -307,11 +307,9 @@
 <div class="header">
 
     <div class="header-line"></div>
-    <div style="display: flex;justify-content: center">
-        <img src="{{ asset('images/ipalogo1.png') }}" width="200px" height="140px">
-    </div>
+    
     <h1>
-        RESEARCH MANAGEMENT SYSTEM
+        RESEARCH SUPERVISSION MANAGEMENT SYSTEM
     </h1>
 
     <h2>
