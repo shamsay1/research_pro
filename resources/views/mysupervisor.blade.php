@@ -807,11 +807,11 @@
                     <i class="bi bi-person-x"></i>
 
                     <h6>
-                        No Core Supervisor Assigned
+                        No Co-Supervisor Assigned
                     </h6>
 
                     <p>
-                        You currently do not have a Core Supervisor.
+                        You currently do not have a Co-Supervisor.
                     </p>
 
                 </div>

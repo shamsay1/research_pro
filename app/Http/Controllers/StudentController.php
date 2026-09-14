@@ -101,13 +101,13 @@ class StudentController extends Controller
             ->with('success', 'Staff unblocked successfully.');
     }
 
-    public function destroy(Student $user)
+    public function destroy(Student $student)
     {
-        $user->delete();
+        $student->delete();
 
         return redirect()
-            ->route('staff.index')
-            ->with('success', 'Staff deleted successfully.');
+            ->route('student.index')
+            ->with('success', 'Student deleted successfully.');
     }
       
 }

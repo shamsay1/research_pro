@@ -70,7 +70,7 @@
 
 
                 {{-- DELETE --}}
-                <form action="{{ route('staff.destroy', $user->id) }}"
+                <form action="{{ route('student.destroy', $user->id) }}"
                       method="POST"
                       class="d-inline"
                       onsubmit="return confirm('Delete this student?')">
