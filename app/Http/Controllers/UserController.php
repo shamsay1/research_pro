@@ -158,8 +158,7 @@ class UserController extends Controller
         $query->where('status', 'active');
     })->get();
 
-    $teachers = SystemUser::where('role', 'supervisors')
-        ->where('status', 'active')
+    $teachers = SystemUser::where('status', 'active')
         ->orderBy('firstname')
         ->get();
 
