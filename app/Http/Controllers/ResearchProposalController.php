@@ -66,8 +66,7 @@ public function store(Request $request)
 
         'document' => [
             'required',
-            'file',
-            'mimes:pdf,doc,docx',
+            'file'
         ],
 
     ]);

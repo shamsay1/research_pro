@@ -471,7 +471,6 @@ public function store1(Request $request)
 
     // Hakikisha supervisor anayechaguliwa ni active supervisor
     $supervisor = SystemUser::where('id', $request->supervisor_id)
-        ->where('role', 'supervisors')
         ->where('status', 'active')
         ->first();
 
