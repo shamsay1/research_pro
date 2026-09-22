@@ -13,21 +13,31 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
+
     ->withMiddleware(function (Middleware $middleware): void {
 
-         $middleware->alias([
+        $middleware->alias([
             'auth.check' => CheckAuthentication::class,
-            'role' => CheckRole::class
+            'role'       => CheckRole::class,
         ]);
 
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        $exceptions->render(function (TokenMismatchException $e, $request) {
 
+    ->withExceptions(function (Exceptions $exceptions): void {
+
+        // Redirect 419 Page Expired to Login Page
+        $exceptions->render(function (
+            TokenMismatchException $e,
+            $request
+        ) {
             return redirect()
                 ->route('login1')
-                ->with('error', 'Your session has expired. Please login again.');
-
+                ->with(
+                    'error',
+                    'This service was in restriction,please login again'
+                );
         });
+
     })
+
     ->create();
