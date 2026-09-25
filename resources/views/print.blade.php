@@ -422,93 +422,70 @@
 </div>
 
 
+{{-- ================================================= --}}
+{{-- SUPERVISOR INFORMATION --}}
+{{-- ================================================= --}}
+
+<div class="section-title">
+    SUPERVISOR INFORMATION
+</div>
+
+@php
+    $supervisors = $student->supervisorAssignments()
+        ->with('supervisor')
+        ->get()
+        ->filter(function ($assignment) {
+            return $assignment->supervisor !== null;
+        })
+        ->sortBy(function ($assignment) {
+            return strtolower(trim($assignment->supervisor_type)) === 'principal' ? 0 : 1;
+        });
+@endphp
+
 <table class="supervisor-table">
 
     <thead>
-
         <tr>
-
-            <th width="35%">
-                TYPE
-            </th>
-
-            <th>
-                NAME
-            </th>
-
+            <th width="35%">TYPE</th>
+            <th>NAME</th>
         </tr>
-
     </thead>
-
 
     <tbody>
 
+        @forelse($supervisors as $assignment)
 
-        {{-- ================================================= --}}
-        {{-- CORE SUPERVISOR --}}
-        {{-- ================================================= --}}
+            <tr>
 
-        <tr>
+                <td>
+                    @if(strtolower(trim($assignment->supervisor_type)) === 'principal')
+                        PRINCIPAL SUPERVISOR
+                    @elseif(strtolower(trim($assignment->supervisor_type)) === 'core')
+                        CO-SUPERVISOR
+                    @else
+                        {{ strtoupper($assignment->supervisor_type) }}
+                    @endif
+                </td>
 
-            <td>
-                Co-Supervisor
-            </td>
+                <td>
+                    {{ $assignment->supervisor->firstname }}
+                    {{ $assignment->supervisor->middlename }}
+                    {{ $assignment->supervisor->lastname }}
+                </td>
 
+            </tr>
 
-            <td>
+        @empty
 
-               
-
-                    {{ $coreSupervisor->supervisor->firstname ?? '' }}
-
-                    {{ $coreSupervisor->supervisor->middlename ?? '' }}
-
-                    {{ $coreSupervisor->supervisor->lastname ?? '' }}
-
-                
-
-            </td>
-
-        </tr>
-
-
-        {{-- ================================================= --}}
-        {{-- PRINCIPAL SUPERVISOR --}}
-        {{-- ================================================= --}}
-
-        <tr>
-
-            <td>
-                PRINCIPAL SUPERVISOR
-            </td>
-
-
-            <td>
-
-                @if(
-                    isset($principalSupervisor) &&
-                    $principalSupervisor &&
-                    $principalSupervisor->supervisor
-                )
-
-                    {{ $principalSupervisor->supervisor->firstname ?? '' }}
-
-                    {{ $principalSupervisor->supervisor->middlename ?? '' }}
-
-                    {{ $principalSupervisor->supervisor->lastname ?? '' }}
-
-                @else
-
+            <tr>
+                <td colspan="2">
                     <span class="empty">
-                        Not Assigned
+                        No Supervisor Assigned
                     </span>
+                </td>
+            </tr>
 
-                @endif
-
-            </td>
-
-        </tr>
-
+        @endforelse
 
     </tbody>
 

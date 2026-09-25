@@ -1105,66 +1105,58 @@ function timeDifference($from, $to)
 </h5>
 
 
+@php
+    $supervisors = $research->student
+        ->supervisorAssignments
+        ->filter(function ($assignment) {
+            return $assignment->supervisor !== null;
+        })
+        ->sortBy(function ($assignment) {
+            return strtolower($assignment->supervisor_type) === 'principal' ? 0 : 1;
+        });
+@endphp
+
 @if($supervisors->count())
 
+    <div class="row">
 
-<div class="row">
+        @foreach($supervisors as $assignment)
 
+            <div class="col-md-6 mb-3">
 
-@foreach(
-    $supervisors
-    as $supervisor
-)
+                <div class="info-card">
 
+                    <div class="label">
+                     
+                            @if($assignment->supervisor_type == "core")
+                            <span class="badge bg-info" style="font-size: 14px;">Co-Supervisor</span>
+                            @else
+                                <span class="badge bg-success" style="font-size: 14px;">Principal Supervisor</span>
+                            @endif
+                            
+                       
+                    </div>
 
-<div class="col-md-4 mb-3">
+                    <div class="value">
+                        {{ $assignment->supervisor->firstname }}
+                        {{ $assignment->supervisor->middlename }}
+                        {{ $assignment->supervisor->lastname }}
+                    </div>
 
+                </div>
 
-<div class="info-card">
+            </div>
 
+        @endforeach
 
-<div class="label">
-
-    <span>{{ $supervisor->supervisor_type }}</span>
-
-</div>
-
-
-<div class="value">
-
-    {{ $supervisor->firstname }}
-
-    {{ $supervisor->middlename }}
-
-    {{ $supervisor->lastname }}
-    
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-@endforeach
-
-
-</div>
-
+    </div>
 
 @else
 
-
-<div class="alert alert-warning mb-0">
-
-    <i class="bi bi-exclamation-triangle me-1"></i>
-
-    No Supervisor Assigned Yet
-
-</div>
-
+    <div class="alert alert-warning mb-0">
+        <i class="bi bi-exclamation-triangle me-1"></i>
+        No Supervisor Assigned Yet
+    </div>
 
 @endif
 
