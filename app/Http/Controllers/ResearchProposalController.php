@@ -185,56 +185,79 @@ public function store(Request $request)
     |--------------------------------------------------------------------------
     */
 
-    $principal = DB::table('supervisor_assignments')
-        ->join(
-            'system_users',
-            'system_users.id',
-            '=',
-            'supervisor_assignments.teacher_id'
-        )
-        ->where(
-            'supervisor_assignments.student_id',
-            $student->id
-        )
-        ->where(
-            'supervisor_assignments.supervisor_type',
-            'core'
-        )
-        ->where(
-            'supervisor_assignments.status',
-            'active'
-        )
-        ->select(
-            'system_users.id',
-            'system_users.firstname',
-            'system_users.middlename',
-            'system_users.lastname',
-            'system_users.email'
-        )
-        ->first();
+  
+/*
+|--------------------------------------------------------------------------
+| GET ALL ACTIVE SUPERVISORS FOR THIS STUDENT
+|--------------------------------------------------------------------------
+|
+| Hapa tunapata supervisor wote waliopo kwenye
+| supervisor_assignments kwa mwanafunzi huyu.
+|
+| Itachukua:
+| - core supervisor
+| - principal supervisor
+|
+*/
+
+$supervisors = DB::table('supervisor_assignments')
+    ->join(
+        'system_users',
+        'system_users.id',
+        '=',
+        'supervisor_assignments.teacher_id'
+    )
+    ->where(
+        'supervisor_assignments.student_id',
+        $student->id
+    )
+    ->where(
+        'supervisor_assignments.status',
+        'active'
+    )
+    ->whereIn(
+        'supervisor_assignments.supervisor_type',
+        ['core', 'principal']
+    )
+    ->select(
+        'system_users.id',
+        'system_users.firstname',
+        'system_users.middlename',
+        'system_users.lastname',
+        'system_users.email',
+        'supervisor_assignments.supervisor_type'
+    )
+    ->get();
+
+
+/*
+|--------------------------------------------------------------------------
+| NOTIFY ALL SUPERVISORS
+|--------------------------------------------------------------------------
+*/
+
+if ($research && $supervisors->count() > 0) {
+
+    /*
+    |--------------------------------------------------------------------------
+    | STUDENT FULL NAME
+    |--------------------------------------------------------------------------
+    */
+
+    $studentName = trim(
+        $student->firstname . ' ' .
+        $student->middlename . ' ' .
+        $student->lastname
+    );
 
 
     /*
     |--------------------------------------------------------------------------
-    | NOTIFY ONLY THIS STUDENT'S CORE SUPERVISOR
+    | LOOP THROUGH ALL SUPERVISORS
     |--------------------------------------------------------------------------
     */
 
-    if ($research && $principal) {
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | STUDENT FULL NAME
-        |--------------------------------------------------------------------------
-        */
-
-        $studentName = trim(
-            $student->firstname . ' ' .
-            $student->middlename . ' ' .
-            $student->lastname
-        );
-
+    foreach ($supervisors as $supervisor) {
 
         /*
         |--------------------------------------------------------------------------
@@ -243,9 +266,20 @@ public function store(Request $request)
         */
 
         $supervisorName = trim(
-            $principal->firstname . ' ' .
-            $principal->middlename . ' ' .
-            $principal->lastname
+            $supervisor->firstname . ' ' .
+            $supervisor->middlename . ' ' .
+            $supervisor->lastname
+        );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | SUPERVISOR TYPE
+        |--------------------------------------------------------------------------
+        */
+
+        $supervisorType = ucfirst(
+            $supervisor->supervisor_type
         );
 
 
@@ -253,6 +287,9 @@ public function store(Request $request)
         |--------------------------------------------------------------------------
         | DATABASE NOTIFICATION
         |--------------------------------------------------------------------------
+        |
+        | Kila supervisor anapata notification yake mwenyewe.
+        |
         */
 
         Notification::create([
@@ -265,10 +302,12 @@ public function store(Request $request)
                 $studentName .
                 ' has submitted a new research proposal: "' .
                 $research->title .
-                '".',
+                '". You are assigned as the ' .
+                $supervisorType .
+                ' Supervisor.',
 
             'supervisor_id' =>
-                $principal->id,
+                $supervisor->id,
 
             'is_read' =>
                 false,
@@ -282,7 +321,7 @@ public function store(Request $request)
         |--------------------------------------------------------------------------
         */
 
-        if (!empty($principal->email)) {
+        if (!empty($supervisor->email)) {
 
             try {
 
@@ -294,6 +333,10 @@ public function store(Request $request)
 
                     "Student Name: " .
                     $studentName .
+                    "\n\n" .
+
+                    "Supervisor Type: " .
+                    $supervisorType .
                     "\n\n" .
 
                     "Research Title: " .
@@ -308,28 +351,54 @@ public function store(Request $request)
                     "Current Status: Pending Review\n\n" .
 
                     "Please login to the Research Management System to review the student's research proposal.\n\n" .
-                    "click the link http://127.0.0.1:8000/".
-                    "\n".
+
+                    "Click the link below:\n" .
+                    "http://rstms.ipa.ac.tz:8001/\n\n" .
+
                     "Regards,\n" .
                     "Research Management System",
 
-                    function ($message) use ($principal) {
+                    function ($message) use ($supervisor) {
 
                         $message
-                            ->to($principal->email)
+                            ->to($supervisor->email)
                             ->subject(
                                 'New Research Proposal Submitted'
                             );
+
                     }
 
                 );
 
             } catch (\Throwable $e) {
 
-                echo 'error';
+                /*
+                |--------------------------------------------------------------------------
+                | EMAIL FAILURE
+                |--------------------------------------------------------------------------
+                |
+                | Email ya supervisor mmoja ikifeli,
+                | supervisor mwingine bado ataendelea kutumiwa.
+                |
+                */
+
+                \Log::error(
+                    'Supervisor research notification email failed',
+                    [
+                        'supervisor_id' =>
+                            $supervisor->id,
+
+                        'email' =>
+                            $supervisor->email,
+
+                        'error' =>
+                            $e->getMessage(),
+                    ]
+                );
             }
         }
     }
+}
 
 
     /*
